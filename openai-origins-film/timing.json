@@ -1,0 +1,255 @@
+{
+  "title": "向所有人",
+  "subtitle": "OpenAI · 从一个研究理想到世界的对话",
+  "duration": 120,
+  "fps": 30,
+  "scenes": [
+    {
+      "start": 0,
+      "end": 10,
+      "label": "PROLOGUE / 序章",
+      "year": "",
+      "title": [
+        "如果智能",
+        "是一束光"
+      ],
+      "detail": "它应该照向谁？",
+      "voice": "如果智能是一束光，它应该照向谁？这是一个关于起点，也关于方向的故事。",
+      "captions": [
+        "如果智能是一束光，它应该照向谁？",
+        "这是一个关于起点，也关于方向的故事。"
+      ],
+      "voice_start": 1.15,
+      "voice_duration": 7.394667
+    },
+    {
+      "start": 10,
+      "end": 23,
+      "label": "01 / THE BEGINNING",
+      "year": "2015",
+      "title": [
+        "一个大胆的",
+        "起点"
+      ],
+      "detail": "12月11日 · 以非营利研究机构起步",
+      "voice": "二零一五年，OpenAI以非营利研究机构起步。一群研究者与创业者聚到一起，希望先进人工智能，能够惠及人类。",
+      "captions": [
+        "2015 年，OpenAI 以非营利研究机构起步。",
+        "一群研究者与创业者聚到一起，",
+        "希望先进人工智能，能够惠及人类。"
+      ],
+      "voice_start": 11.15,
+      "voice_duration": 10.978792
+    },
+    {
+      "start": 23,
+      "end": 35,
+      "label": "02 / LEARNING LANGUAGE",
+      "year": "2018",
+      "title": [
+        "从海量语言中",
+        "学习规律"
+      ],
+      "detail": "GPT · 生成式预训练的起点",
+      "voice": "二零一八年，早期GPT展示了一条道路：先从大量文本中学习，再适应不同任务。语言，成为通往通用能力的一扇门。",
+      "captions": [
+        "2018 年，早期 GPT 展示了一条道路：",
+        "先从大量文本中学习，再适应不同任务。",
+        "语言，成为通往通用能力的一扇门。"
+      ],
+      "voice_start": 24.15,
+      "voice_duration": 9.980958
+    },
+    {
+      "start": 35,
+      "end": 47,
+      "label": "03 / THE COST OF SCALE",
+      "year": "2019",
+      "title": [
+        "让理想",
+        "拥有算力"
+      ],
+      "detail": "OpenAI LP · 当年的“利润上限”结构",
+      "voice": "但更大的模型，需要更多算力和资金。二零一九年，OpenAI设立利润上限结构，并与微软达成投资和计算平台合作。",
+      "captions": [
+        "更大的模型，需要更多算力和资金。",
+        "2019 年，OpenAI 设立“利润上限”结构，",
+        "并与微软达成投资和计算平台合作。"
+      ],
+      "voice_start": 36.15,
+      "voice_duration": 9.983708
+    },
+    {
+      "start": 47,
+      "end": 59,
+      "label": "04 / FROM RESEARCH TO TOOLS",
+      "year": "2020—21",
+      "title": [
+        "能力",
+        "走出实验室"
+      ],
+      "detail": "GPT-3 / API / DALL·E",
+      "voice": "随后，GPT三和API让开发者接入语言能力。DALL·E探索用文字生成图像。研究，开始变成人们可以使用的工具。",
+      "captions": [
+        "GPT-3 和 API，让开发者接入语言能力。",
+        "DALL·E 探索用文字生成图像。",
+        "研究，开始变成人们可以使用的工具。"
+      ],
+      "voice_start": 48.15,
+      "voice_duration": 9.983125
+    },
+    {
+      "start": 59,
+      "end": 74,
+      "label": "05 / THE WORLD STARTS TALKING",
+      "year": "2022.11.30",
+      "title": [
+        "世界",
+        "开始对话"
+      ],
+      "detail": "ChatGPT · 以研究预览形式发布",
+      "voice": "二零二二年十一月三十日，ChatGPT以研究预览的形式发布。复杂的模型，变成一个简单的对话框。提问，追问，修改。人工智能，走进日常。",
+      "captions": [
+        "2022 年 11 月 30 日，ChatGPT 以研究预览形式发布。",
+        "复杂的模型，变成一个简单的对话框。",
+        "提问，追问，修改。人工智能，走进日常。"
+      ],
+      "voice_start": 60.15,
+      "voice_duration": 12.98125
+    },
+    {
+      "start": 74,
+      "end": 86,
+      "label": "06 / BEYOND TEXT",
+      "year": "2023—24",
+      "title": [
+        "从读懂文字",
+        "到连接感官"
+      ],
+      "detail": "GPT-4 → GPT-4o · 多模态的延伸",
+      "voice": "从GPT四，到GPT四欧，交互进一步连接文字、图像与声音。人们开始用更自然的方式，表达问题，探索想法。",
+      "captions": [
+        "从 GPT-4 到 GPT-4o，",
+        "交互进一步连接文字、图像与声音。",
+        "人们开始用更自然的方式，表达问题，探索想法。"
+      ],
+      "voice_start": 75.15,
+      "voice_duration": 9.981333
+    },
+    {
+      "start": 86,
+      "end": 98,
+      "label": "07 / CAPABILITY & RESPONSIBILITY",
+      "year": "",
+      "title": [
+        "能力越强",
+        "责任越大"
+      ],
+      "detail": "广泛受益 / 长期安全 / 合作",
+      "voice": "而能力越强，责任也越大。让通用人工智能造福所有人，是OpenAI写入宪章的使命。安全、公平与治理，仍需要持续回答。",
+      "captions": [
+        "能力越强，责任也越大。",
+        "让通用人工智能造福所有人，是 OpenAI 写入宪章的使命。",
+        "安全、公平与治理，仍需要持续回答。"
+      ],
+      "voice_start": 87.15,
+      "voice_duration": 9.984167
+    },
+    {
+      "start": 98,
+      "end": 110,
+      "label": "08 / A SHARED HORIZON",
+      "year": "",
+      "title": [
+        "向所有人"
+      ],
+      "detail": "让更多人，有能力创造、学习与发现。",
+      "voice": "从一个研究理想，到世界的对话，这段历史仍在书写。真正值得期待的未来，是更多人能够创造、学习，并参与决定智能的方向。",
+      "captions": [
+        "从一个研究理想，到世界的对话，这段历史仍在书写。",
+        "真正值得期待的未来，",
+        "是更多人能够创造、学习，并参与决定智能的方向。"
+      ],
+      "voice_start": 99.15,
+      "voice_duration": 9.982667
+    },
+    {
+      "start": 110,
+      "end": 120,
+      "label": "EPILOGUE / 尾声",
+      "year": "",
+      "title": [
+        "OpenAI"
+      ],
+      "detail": "向所有人  ·  A LIGHT FOR EVERYONE",
+      "voice": "光的意义，在于它照亮了谁。",
+      "captions": [
+        "光的意义，在于它照亮了谁。"
+      ],
+      "voice_start": 111.15,
+      "voice_duration": 3.338667
+    }
+  ],
+  "sources": [
+    {
+      "title": "Introducing OpenAI",
+      "date": "2015-12-11",
+      "url": "https://openai.com/index/introducing-openai/",
+      "supports": "创立时的非营利定位、宗旨及早期参与者"
+    },
+    {
+      "title": "Improving language understanding with unsupervised learning",
+      "date": "2018-06-11",
+      "url": "https://openai.com/index/language-unsupervised/",
+      "supports": "GPT 的无监督预训练和任务适应路线"
+    },
+    {
+      "title": "OpenAI LP",
+      "date": "2019-03-11",
+      "url": "https://openai.com/index/openai-lp/",
+      "supports": "2019 年设立的利润上限结构及算力资金需求；仅陈述当年结构"
+    },
+    {
+      "title": "Microsoft invests in and partners with OpenAI",
+      "date": "2019-07-22",
+      "url": "https://openai.com/index/microsoft-invests-in-and-partners-with-openai/",
+      "supports": "微软投资及 Azure 计算平台合作"
+    },
+    {
+      "title": "OpenAI API",
+      "date": "2020-06-11",
+      "url": "https://openai.com/index/openai-api/",
+      "supports": "开放模型 API 供开发者使用"
+    },
+    {
+      "title": "DALL·E: Creating images from text",
+      "date": "2021-01-05",
+      "url": "https://openai.com/index/dall-e/",
+      "supports": "文字生成图像的研究"
+    },
+    {
+      "title": "Introducing ChatGPT",
+      "date": "2022-11-30",
+      "url": "https://openai.com/index/chatgpt/",
+      "supports": "ChatGPT 研究预览发布、对话交互"
+    },
+    {
+      "title": "GPT-4",
+      "date": "2023-03-14",
+      "url": "https://openai.com/index/gpt-4-research/",
+      "supports": "GPT-4 多模态能力"
+    },
+    {
+      "title": "Hello GPT-4o",
+      "date": "2024-05-13",
+      "url": "https://openai.com/index/hello-gpt-4o/",
+      "supports": "文字、图像和声音的交互能力"
+    },
+    {
+      "title": "OpenAI Charter",
+      "date": "",
+      "url": "https://openai.com/charter/",
+      "supports": "造福全人类、广泛受益、长期安全与合作的使命和原则"
+    }
+  ]
+}

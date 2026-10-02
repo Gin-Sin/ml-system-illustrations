@@ -1,0 +1,6 @@
+numpy>=1.26
+scipy>=1.11
+Pillow>=10.0
+moderngl>=5.10
+glcontext>=3.0
+edge-tts>=7.0

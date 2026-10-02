@@ -1,0 +1,15 @@
+# Full-resolution video and source bundle are distributed through GitHub Releases.
+/openai-a-light-for-everyone.mp4
+/openai-film-source.zip
+/part-*.mp4
+/picture.mp4
+/preview.mp4
+/concat.txt
+/render-*.log
+/.venv/
+/stills/
+/audio/score.wav
+/audio/effects.wav
+/audio/narration.wav
+/audio/mix_raw.wav
+/audio/master.wav

@@ -1,0 +1,35 @@
+{
+  "release": "openai-film-v1",
+  "assets": [
+    {
+      "name": "openai-a-light-for-everyone.mp4",
+      "bytes": 206094419,
+      "sha256": "0b9b5500baed5e6a2bb7faa7097b3c80ad46d8cc4971cc50f38e5942e7230c25",
+      "url": "https://github.com/Gin-Sin/ml-system-illustrations/releases/download/openai-film-v1/openai-a-light-for-everyone.mp4"
+    },
+    {
+      "name": "original-score.mp3",
+      "bytes": 3841581,
+      "sha256": "6c0d28a88c4054e99574681ea9902d4f3f805a9494bdff333de564c243ee8a97",
+      "url": "https://github.com/Gin-Sin/ml-system-illustrations/releases/download/openai-film-v1/original-score.mp3"
+    },
+    {
+      "name": "captions.srt",
+      "bytes": 2287,
+      "sha256": "80370e179b23af0fecfd5e909ec3bd46558e646f3ec66972e81d31ee2b576b5a",
+      "url": "https://github.com/Gin-Sin/ml-system-illustrations/releases/download/openai-film-v1/captions.srt"
+    },
+    {
+      "name": "openai-film-source.zip",
+      "bytes": 8100687,
+      "sha256": "d047856038fbae2b8cfbf7b73426c9f33f6db02d90c76f8d8a248fccee4d0ed1",
+      "url": "https://github.com/Gin-Sin/ml-system-illustrations/releases/download/openai-film-v1/openai-film-source.zip"
+    },
+    {
+      "name": "poster.jpg",
+      "bytes": 338448,
+      "sha256": "dece5edb7a4e7a5b45c7b9fbb2a5e2ad6c95424b38bfbf9813073b279a183ee9",
+      "url": "https://github.com/Gin-Sin/ml-system-illustrations/releases/download/openai-film-v1/poster.jpg"
+    }
+  ]
+}
