@@ -22,8 +22,8 @@
     />
     <title>PagedAttention — ML Systems, Illustrated</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="style.css" />
-    <script type="module" src="app.js"></script>
+    <link rel="stylesheet" href="style.css?v=2" />
+    <script type="module" src="app.js?v=2"></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -77,22 +77,26 @@
               controls
               playsinline
               preload="metadata"
-              poster="assets/poster.jpg"
+              poster="assets/poster.jpg?v=2"
               aria-label="PagedAttention: a six-chapter Manim animation"
             >
-              <source src="assets/paged-attention.mp4" type="video/mp4" />
+              <source src="assets/paged-attention.mp4?v=2" type="video/mp4" />
               <track
                 kind="captions"
                 label="English"
                 srclang="en"
-                src="assets/captions.vtt"
+                src="assets/captions.vtt?v=2"
               />
               Your browser does not support embedded video.
-              <a href="assets/paged-attention.mp4">Download the animation.</a>
+              <a href="assets/paged-attention.mp4?v=2"
+                >Download the animation.</a
+              >
             </video>
             <div class="screen-footer">
               <span><i class="tiny-dot"></i> A GEOMETRIC EXPLANATION</span
-              ><a href="assets/paged-attention.mp4" download>Download film ↓</a>
+              ><a href="assets/paged-attention.mp4?v=2" download
+                >Download film ↓</a
+              >
             </div>
           </div>
           <nav class="chapters" aria-label="Video chapters">
@@ -109,7 +113,7 @@
           </summary>
           <div id="transcript-content">
             The film captions are also available as
-            <a href="assets/captions.vtt">a text file</a>.
+            <a href="assets/captions.vtt?v=2">a text file</a>.
           </div>
         </details>
       </section>
@@ -224,16 +228,28 @@
         </div>
         <div class="note-grid">
           <article>
-            <span class="note-symbol blue">⌊t / B⌋</span>
+            <img
+              class="note-equation"
+              src="assets/logical-block.svg"
+              alt="Floor of t divided by B"
+              width="110"
+              height="48"
+            />
             <h3>Separate order from location.</h3>
             <p>
-              Token <var>t</var> belongs to logical block ⌊<var>t / B</var>⌋, at
-              offset <var>t</var> mod <var>B</var>. The block table supplies its
-              physical address.
+              Divide token index <var>t</var> by block size <var>B</var>. The
+              quotient chooses the logical block; the remainder chooses the
+              slot. The block table supplies the physical address.
             </p>
           </article>
           <article>
-            <span class="note-symbol teal">∑ αᵢ vᵢ</span>
+            <img
+              class="note-equation"
+              src="assets/weighted-sum.svg"
+              alt="Sum from i equals zero to t of alpha i times value vector i"
+              width="158"
+              height="48"
+            />
             <h3>Keep the same attention.</h3>
             <p>
               All valid keys participate in the same normalization. Physical
@@ -242,7 +258,13 @@
             </p>
           </article>
           <article>
-            <span class="note-symbol gold">B − 1</span>
+            <img
+              class="note-equation"
+              src="assets/tail-bound.svg"
+              alt="B minus one"
+              width="90"
+              height="48"
+            />
             <h3>Bound the unused tail.</h3>
             <p>
               A sequence’s final block wastes at most <var>B − 1</var> token

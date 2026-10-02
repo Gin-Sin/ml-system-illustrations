@@ -27,6 +27,13 @@ with sync_playwright() as p:
     page.on("pageerror", lambda error: errors.append(str(error)))
     response = page.goto(url, wait_until="networkidle")
     assert response.status == 200
+    page.evaluate("document.fonts.ready")
+    narrative_font = page.locator("h1").evaluate("e => getComputedStyle(e).fontFamily")
+    code_font = page.locator(".address").evaluate("e => getComputedStyle(e).fontFamily")
+    assert "CMU Serif" in narrative_font, narrative_font
+    assert "JetBrains Mono" in code_font, code_font
+    assert page.evaluate("document.fonts.check('16px \"CMU Serif\"') && document.fonts.check('16px \"JetBrains Mono\"')")
+    assert page.locator(".note-equation").evaluate_all("images => images.length === 3 && images.every(image => image.complete && image.naturalWidth > 0)")
     expect(page.locator(".chapter")).to_have_count(6)
     expect(page.locator("#metric-used")).to_have_text("9")
     expect(page.locator("#metric-blocks")).to_have_text("3 / 12")
@@ -94,5 +101,5 @@ with sync_playwright() as p:
     page.evaluate("scrollTo(0,0)")
     page.screenshot(path=str(out / "mobile.png"),full_page=True)
     assert not errors, errors
-    print(f"PASS: allocator controls, full-pool handling, keyboard input, six video seeks, transcript, and five responsive widths. Video: {metadata}")
+    print(f"PASS: distinct narrative/code fonts, LaTeX SVGs, allocator controls, full-pool handling, keyboard input, six video seeks, transcript, and five responsive widths. Video: {metadata}")
     browser.close()

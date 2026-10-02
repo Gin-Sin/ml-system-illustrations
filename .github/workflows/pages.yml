@@ -29,6 +29,11 @@ jobs:
           test -s docs/assets/chapters.json
           test -s docs/assets/captions.vtt
           test -s docs/assets/poster.jpg
+          test -s docs/assets/logical-block.svg
+          test -s docs/assets/weighted-sum.svg
+          test -s docs/assets/tail-bound.svg
+          test -s docs/assets/fonts/cmu-serif-regular.woff2
+          test -s docs/assets/fonts/jetbrains-mono-regular.woff2
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

@@ -1,61 +1,61 @@
 WEBVTT
 
-00:00:01.000 --> 00:00:07.167
-During decoding, each token contributes a key and a value to the KV cache.
+00:00:01.000 --> 00:00:08.750
+Each token leaves behind two vectors: a key and a value. One attention head is shown here.
 
-00:00:07.167 --> 00:00:13.533
-The next query attends to the stored keys, then mixes the stored values.
+00:00:08.750 --> 00:00:15.600
+Decoding appends another key–value pair. The earlier vectors stay in the cache.
 
-00:00:13.533 --> 00:00:19.400
-As requests grow at different speeds, where should all these KV entries live?
+00:00:15.600 --> 00:00:25.450
+The next query reuses this growing cache to compute attention over the available context.
 
-00:00:20.400 --> 00:00:26.567
-Imagine reserving 12 token slots per request, before its final length is known.
+00:00:26.450 --> 00:00:33.200
+Suppose each request reserves twelve token slots, even though its final length is unknown.
 
-00:00:26.567 --> 00:00:31.933
-Instead, allocate fixed-size blocks on demand. Here, one block holds four tokens.
+00:00:33.200 --> 00:00:39.750
+Cut the cache into blocks of four. Allocate only the blocks needed by the current tokens.
 
-00:00:31.933 --> 00:00:38.000
-Only a request’s last block can have unused slots: at most B − 1 per sequence.
+00:00:39.750 --> 00:00:48.500
+The same fourteen tokens now occupy twenty slots. Only the final block of each request has slack.
 
-00:00:39.000 --> 00:00:45.867
-Logical blocks preserve token order. Physical blocks can live anywhere in the pool.
+00:00:49.500 --> 00:00:57.250
+A block table connects the token sequence to physical memory. Matching colors follow the same data.
 
-00:00:45.867 --> 00:00:51.433
-For token 6 with B = 4: logical block = floor(6 / 4) = 1, offset = 2.
+00:00:57.250 --> 00:01:02.500
+For token six, divide by the block size. The quotient chooses a block; the remainder chooses a slot.
 
-00:00:51.433 --> 00:00:57.700
-The table maps logical block 1 to physical block 2. The token offset stays 2.
+00:01:02.500 --> 00:01:10.050
+Follow table[1] to physical block P2, then read slot 2. The logical token index is still six.
 
-00:00:58.700 --> 00:01:05.350
-The attention kernel follows the block table to read the request’s keys and values.
+00:01:11.050 --> 00:01:21.600
+The query compares with every valid key, even when those keys are stored in different physical blocks.
 
-00:01:05.350 --> 00:01:12.500
-Each key produces a score. All valid scores share one softmax normalization.
+00:01:21.600 --> 00:01:29.250
+Softmax normalizes all of these scores together. Physical block boundaries do not split the denominator.
 
-00:01:12.500 --> 00:01:18.650
-Mix the values with these weights. Paging changes addresses, not the attention formula.
+00:01:29.250 --> 00:01:36.100
+Use these weights to mix the value vectors. Paging changes storage, while preserving the attention calculation.
 
-00:01:19.700 --> 00:01:24.167
-A six-token request owns two blocks. Its last block still has room.
+00:01:37.100 --> 00:01:42.850
+At six tokens, the request owns two blocks. Appending token six writes into an existing slot.
 
-00:01:24.167 --> 00:01:28.133
-Tokens 6 and 7 fill existing space. No new physical block is needed.
+00:01:42.850 --> 00:01:46.900
+Token seven fills the remaining slot. The block table is unchanged.
 
-00:01:28.133 --> 00:01:32.500
-Token 8 crosses a block boundary. Allocate a free block and extend the table.
+00:01:46.900 --> 00:01:53.550
+For token eight, the offset becomes zero. Allocate a free block, then extend the table.
 
-00:01:32.500 --> 00:01:37.867
-When this request finishes, its unshared blocks return to the pool for reuse.
+00:01:53.550 --> 00:01:59.700
+After the request finishes, its unshared blocks return to the pool and can serve another request.
 
-00:01:38.867 --> 00:01:44.417
-Two continuations can share the same prefix blocks instead of duplicating their KV data.
+00:02:00.700 --> 00:02:07.150
+Two continuations can share prefix blocks. Reference counts record how many requests still need each block.
 
-00:01:44.417 --> 00:01:48.083
-If A appends to a shared partial block, first copy that block to a new physical block.
+00:02:07.150 --> 00:02:12.700
+A is about to append into a shared partial block. First copy that block; then change only A’s table.
 
-00:01:48.083 --> 00:01:52.350
-A writes token 6 into its private copy. B’s cache is untouched; the full prefix stays shared.
+00:02:12.700 --> 00:02:18.050
+Now A can write token six into its private copy. B’s data stays unchanged, and the full prefix remains shared.
 
-00:01:52.350 --> 00:01:58.817
-PagedAttention combines block-based storage, address translation, and safe KV-cache sharing.
+00:02:18.050 --> 00:02:24.900
+PagedAttention keeps token order intact while making GPU memory easier to allocate, reuse, and share.

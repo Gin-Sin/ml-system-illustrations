@@ -1,32 +1,32 @@
 [
   {
-    "title": "Every new token carries a memory",
+    "title": "What does the model remember?",
     "start": 0.0,
-    "duration": 19.4
+    "duration": 25.45
   },
   {
-    "title": "Reserving the future wastes the present",
-    "start": 19.4,
-    "duration": 18.6
+    "title": "How much memory should we reserve?",
+    "start": 25.45,
+    "duration": 23.05
   },
   {
-    "title": "An address is a lookup, not a location",
-    "start": 38.0,
-    "duration": 19.7
+    "title": "Order and location are different things",
+    "start": 48.5,
+    "duration": 21.55
   },
   {
-    "title": "Scattered storage. The same attention.",
-    "start": 57.7,
-    "duration": 21.0
+    "title": "The addresses change. The mathematics stays.",
+    "start": 70.05,
+    "duration": 26.05
   },
   {
-    "title": "Grow one block at a time",
-    "start": 78.7,
-    "duration": 19.166667
+    "title": "Cross a boundary. Allocate one block.",
+    "start": 96.1,
+    "duration": 23.6
   },
   {
-    "title": "Share the past. Copy only when writing.",
-    "start": 97.867,
-    "duration": 20.966667
+    "title": "A shared past. Two different futures.",
+    "start": 119.7,
+    "duration": 25.2
   }
 ]

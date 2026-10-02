@@ -1,3 +1,38 @@
+@font-face {
+  font-family: "CMU Serif";
+  src: url("assets/fonts/cmu-serif-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "CMU Serif";
+  src: url("assets/fonts/cmu-serif-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("assets/fonts/jetbrains-mono-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Lato";
+  src: url("assets/fonts/lato-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Lato";
+  src: url("assets/fonts/lato-bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 :root {
   color-scheme: dark;
   --bg: #0b1018;
@@ -5,18 +40,14 @@
   --ink: #edf1f7;
   --muted: #97a4b6;
   --line: #273244;
-  --blue: #69b7ff;
-  --teal: #63dec1;
-  --gold: #f1c77a;
-  --purple: #bb9aff;
-  font-family:
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  --blue: #58c4dd;
+  --teal: #5cd0b3;
+  --gold: #ffff80;
+  --purple: #c792ea;
+  --font-narrative: "CMU Serif", Georgia, serif;
+  --font-interface: "Lato", system-ui, sans-serif;
+  --font-code: "JetBrains Mono", "Courier New", monospace;
+  font-family: var(--font-interface);
   color: var(--ink);
   background: var(--bg);
   font-synthesis: none;
@@ -132,8 +163,7 @@ button:disabled {
 .legend,
 .lab-note,
 footer {
-  font-family:
-    ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-interface);
 }
 .eyebrow {
   font-size: 11px;
@@ -163,7 +193,7 @@ h1 {
 }
 h1 em,
 .lab-heading em {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-narrative);
   font-weight: 400;
   color: var(--teal);
 }
@@ -290,7 +320,7 @@ video {
 }
 .chapter .number,
 .chapter time {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-code);
   font-size: 10px;
   color: var(--muted);
 }
@@ -342,7 +372,7 @@ video {
 #transcript-content button {
   border: 0;
   padding: 2px 9px 2px 0;
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-code);
   color: var(--teal);
   background: none;
   font-size: 11px;
@@ -494,9 +524,7 @@ video {
   margin: 11px 0;
 }
 .logical-block > span {
-  font:
-    10px ui-monospace,
-    monospace;
+  font: 10px var(--font-code);
   color: var(--muted);
 }
 .cells {
@@ -520,9 +548,7 @@ video {
   justify-content: center;
   align-items: center;
   color: var(--request-color, var(--blue));
-  font:
-    11px ui-monospace,
-    monospace;
+  font: 11px var(--font-code);
 }
 .cell.empty {
   border-color: var(--line);
@@ -545,7 +571,7 @@ video {
 }
 .lookup-control output {
   color: var(--gold);
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-code);
 }
 .lookup-control input {
   width: 100%;
@@ -564,9 +590,7 @@ video {
   border-radius: 3px;
   background: transparent;
   color: var(--muted);
-  font:
-    12px ui-monospace,
-    monospace;
+  font: 12px var(--font-code);
 }
 .table-row span {
   color: var(--gold);
@@ -600,9 +624,7 @@ video {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font:
-    9px ui-monospace,
-    monospace;
+  font: 9px var(--font-code);
   color: var(--muted);
   margin-bottom: 7px;
 }
@@ -648,9 +670,7 @@ video {
   background: var(--line);
 }
 .address {
-  font:
-    12px ui-monospace,
-    monospace;
+  font: 12px var(--font-code);
   color: var(--muted);
   padding: 19px 24px;
   border-top: 1px solid var(--line);
@@ -718,6 +738,12 @@ video {
     italic 30px Georgia,
     serif;
 }
+.note-equation {
+  display: block;
+  height: 48px;
+  object-fit: contain;
+  object-position: left center;
+}
 .blue {
   color: var(--blue);
 }
@@ -756,9 +782,7 @@ video {
 }
 .reading a > span {
   color: var(--muted);
-  font:
-    10px ui-monospace,
-    monospace;
+  font: 10px var(--font-code);
 }
 .reading a > span:last-child {
   margin-left: auto;
@@ -1146,5 +1170,84 @@ footer {
   }
   * {
     transition: none !important;
+  }
+}
+
+/* Typography roles stay consistent with the film. */
+h1,
+.lab-heading h3,
+#transcript-content,
+.note-grid p,
+.lab-heading p,
+.intro-bottom p,
+.note-grid h3,
+.reading h2 {
+  font-family: var(--font-narrative);
+}
+h1 {
+  font-weight: 400;
+  letter-spacing: -1.8px;
+}
+.intro-bottom p {
+  font-size: 20px;
+  line-height: 1.5;
+}
+.lab-heading p {
+  font-size: 19px;
+  line-height: 1.55;
+}
+.note-grid p {
+  font-size: 17px;
+  line-height: 1.6;
+}
+.note-grid h3 {
+  font-size: 21px;
+  font-weight: 400;
+}
+#transcript-content {
+  font-size: 19px;
+  line-height: 1.65;
+}
+#transcript-content h3 {
+  font-family: var(--font-narrative);
+  font-size: 24px;
+  font-weight: 400;
+}
+code,
+pre,
+.address,
+.cell,
+.table-row,
+.block-label,
+.logical-block > span,
+.lookup-control output,
+#transcript-content button {
+  font-family: var(--font-code);
+  font-variant-ligatures: none;
+}
+#logical-blocks .cells {
+  gap: 0;
+}
+#logical-blocks .cell {
+  border-radius: 0;
+  border-right-width: 0;
+}
+#logical-blocks .cell:last-child {
+  border-right-width: 1px;
+}
+.physical-block,
+.table-row {
+  border-radius: 0;
+}
+@media (max-width: 540px) {
+  .intro-bottom p,
+  .lab-heading p {
+    font-size: 17px;
+  }
+  .note-grid p {
+    font-size: 16px;
+  }
+  #transcript-content {
+    font-size: 17px;
   }
 }

@@ -1,7 +1,7 @@
 import { Allocator } from "./allocator.js";
 
 const $ = (id) => document.getElementById(id);
-const colors = { A: "#69b7ff", B: "#bb9aff", C: "#63dec1", D: "#f28d9b" };
+const colors = { A: "#58c4dd", B: "#c792ea", C: "#5cd0b3", D: "#f28d9b" };
 let model = new Allocator(),
   selected = "A",
   token = 0;
@@ -48,7 +48,7 @@ function render() {
   $("physical-blocks").innerHTML = model.pool
     .map((p, i) => {
       const owners = model.owners(i),
-        color = p.refs > 1 ? "#f1c77a" : (colors[owners[0]] ?? "#354257");
+        color = p.refs > 1 ? "#ffff80" : (colors[owners[0]] ?? "#354257");
       return `<div class="physical-block ${p.refs ? "allocated" : ""} ${address?.physical === i ? "selected" : ""}" style="--request-color:${color}" aria-label="Physical block ${i}, ${p.refs ? `owners ${owners.join(", ")}, reference count ${p.refs}` : "free"}"><div class="block-label"><span>P${i}</span><small>${p.refs ? `${owners.join("/")} · ${p.refs}` : "free"}</small></div>${cells(
         p.tokens.map((t) => t.replace(/^[A-D]/, "")),
         model.blockSize,
@@ -62,7 +62,7 @@ function render() {
   $("token").disabled = !r?.length;
   $("token-value").value = r?.length ? token : "—";
   $("address").innerHTML = address
-    ? `token <strong>${token}</strong> → logical <strong>⌊${token}/${model.blockSize}⌋ = ${address.logical}</strong> → table[${address.logical}] = <strong>${address.physical}</strong> → <strong>P${address.physical}[${address.offset}]</strong>`
+    ? `token <strong>${token}</strong> → b = <strong>${token} // ${model.blockSize} = ${address.logical}</strong> → table[${address.logical}] = <strong>${address.physical}</strong> → <strong>P${address.physical}[${address.offset}]</strong>`
     : "No token selected. Reset the playground to start again.";
   const stats = model.stats();
   $("metric-used").textContent = stats.used;
@@ -152,8 +152,8 @@ function seek(start) {
 }
 try {
   const [chapterResponse, transcriptResponse] = await Promise.all([
-    fetch("assets/chapters.json"),
-    fetch("assets/transcript.json"),
+    fetch("assets/chapters.json?v=2"),
+    fetch("assets/transcript.json?v=2"),
   ]);
   if (!chapterResponse.ok || !transcriptResponse.ok)
     throw new Error("Chapter metadata unavailable");

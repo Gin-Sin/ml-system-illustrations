@@ -22,19 +22,23 @@ def stamp(seconds):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--quality", choices=["l", "m", "h"], default="h")
+    parser.add_argument("--fps", type=int, choices=[30, 60])
     parser.add_argument("--assemble-only", action="store_true")
     args = parser.parse_args()
+    fps = args.fps or (30 if args.quality == "l" else 60)
     if not args.assemble_only:
-        run(sys.executable, "-m", "manim", f"-q{args.quality}", "--fps", "30",
+        run(sys.executable, "-m", "manim", f"-q{args.quality}", "--fps", str(fps),
             "scenes/paged_attention.py", *CHAPTERS)
-    folder = ROOT / "media/videos/paged_attention" / {"l":"480p30","m":"720p30","h":"1080p30"}[args.quality]
+    resolution = {"l":480,"m":720,"h":1080}[args.quality]
+    folder = ROOT / "media/videos/paged_attention" / f"{resolution}p{fps}"
     concat = ROOT / "media/concat.txt"
     concat.write_text("".join(f"file '{folder / (name + '.mp4')}'\n" for name in CHAPTERS))
     assets = ROOT / "docs/assets"
     assets.mkdir(parents=True, exist_ok=True)
     run("ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(concat),
-        "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-pix_fmt", "yuv420p", "-movflags", "+faststart",
-        "-an", str(assets / "paged-attention.mp4"))
+        "-c:v", "libx264", "-preset", "slow", "-crf", "18", "-pix_fmt", "yuv420p", "-movflags", "+faststart",
+        "-an", str(ROOT / "media/paged-attention.mp4"))
+    (ROOT / "media/paged-attention.mp4").replace(assets / "paged-attention.mp4")
     chapters, cues, offset = [], [], 0.0
     for name in CHAPTERS:
         data = json.loads((ROOT / f"media/timings/{name}.json").read_text())
@@ -48,8 +52,11 @@ def main():
     (assets / "captions.vtt").write_text("WEBVTT\n\n"+"\n\n".join(
         f"{stamp(c['start'])} --> {stamp(c['end'])}\n{c['text']}" for c in cues)+"\n")
     (assets / "transcript.json").write_text(json.dumps(cues,indent=2)+"\n")
-    run("ffmpeg","-y","-v","error","-ss",str(chapters[2]["start"]+10),"-i",str(assets / "paged-attention.mp4"),
+    mapping = json.loads((ROOT / "media/timings/BlockMapping.json").read_text())
+    poster_time = next((f["time"] for f in mapping.get("review_frames", []) if f["name"] == "address-translation"), 10)
+    run("ffmpeg","-y","-v","error","-ss",str(chapters[2]["start"]+poster_time+.25),"-i",str(assets / "paged-attention.mp4"),
         "-frames:v","1","-update","1",str(assets / "poster.jpg"))
+    run(sys.executable, "scripts/build_typography.py")
     print(f"Built {offset:.1f}s video, {len(chapters)} chapters, and {len(cues)} captions.")
 
 

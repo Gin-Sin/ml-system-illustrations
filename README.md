@@ -19,22 +19,28 @@ The web page includes chapter navigation, a searchable browser-native text trans
 
 ## Reproduce the animation
 
-Python 3.12, Manim Community 0.19.0, FFmpeg, Cairo, Pango, and DejaVu fonts are used. No GPU or LaTeX is needed. On Ubuntu/Debian:
+Python 3.12, Manim Community 0.19.0, FFmpeg, Cairo, Pango, LaTeX, and dvisvgm are used. No GPU is needed. On Ubuntu/Debian:
 
 ```sh
 sudo apt-get update
-sudo apt-get install -y python3-venv python3-dev build-essential pkg-config libcairo2-dev libpango1.0-dev ffmpeg fonts-dejavu-core
+sudo apt-get install -y python3-venv python3-dev build-essential pkg-config libcairo2-dev libpango1.0-dev ffmpeg texlive-latex-base texlive-latex-extra texlive-fonts-recommended dvisvgm fonts-cmu fonts-jetbrains-mono fonts-lato
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 .venv/bin/python scripts/render.py
 ```
 
-The default render is **1920 × 1080 at 30 fps**. The script renders six scenes, combines them into a browser-compatible H.264 MP4, and derives the chapter times, captions, transcript, and poster from the render. Captions also appear within the animation, so it works without audio or enabled subtitle tracks.
+The default render is **1920 × 1080 at 60 fps**. The script renders six scenes, combines them into a browser-compatible H.264 MP4, and derives the chapter times, captions, transcript, and poster from the render. Captions also appear within the animation, so it works without audio or enabled subtitle tracks.
+
+The visual system uses **CMU Serif** for narration, **JetBrains Mono** for code and physical addresses, and real **Computer Modern LaTeX** for mathematics. Serif labels, symbolic vectors, memory strips, restrained brackets, and data-linked highlights replace the original rounded-card diagrams. The website embeds the fonts locally and uses LaTeX SVGs for its takeaway equations. Font redistribution notices are included in `docs/assets/fonts/`.
+
+Visual references: [3Blue1Brown’s attention lesson and video frames](https://www.3blue1brown.com/lessons/attention/) and [its original Manim source](https://github.com/3b1b/videos/blob/master/_2024/transformers/attention.py). Reference artwork is not bundled into this project.
 
 ```sh
 # Fast visual draft, or assemble already-rendered chapters:
 .venv/bin/python scripts/render.py --quality l
 .venv/bin/python scripts/render.py --assemble-only
+# Extract the authored visual review moments:
+.venv/bin/python scripts/review_frames.py
 ```
 
 `--quality l` overwrites the published assets with a draft; run the default render again before publishing. The checked-in MP4 lets GitHub Pages deploy without installing Manim in CI.
@@ -63,7 +69,7 @@ Push to `main` to run the tests and publish `docs/` through the GitHub Pages wor
 
 The allocator is a teaching model, not a vLLM implementation. One cell stands for the KV vectors associated with a token; real tensor layouts include layers, KV heads, and head dimensions. Memory pages here are GPU KV-cache blocks, not necessarily hardware virtual-memory pages.
 
-The attention chapter shows the mathematical result. Real kernels can fuse operations or combine partition statistics; they do not need to materialize the complete score vector shown in the diagram. The normalization covers the request’s valid causal context, not each physical block independently.
+The attention chapter shows the mathematical result. Token vectors are columns, so the introductory equation is $\mathbf{o}_t = V_{\leq t}\operatorname{softmax}(K_{\leq t}^{\mathsf T}\mathbf{q}_t/\sqrt{d_k})$; this is equivalent to the usual row-vector convention. The numerical scores in chapter four are illustrative, and their probabilities are computed with an actual softmax. Displayed values are rounded. Real kernels can fuse operations or combine partition statistics; they do not need to materialize the complete score vector shown in the diagram. The normalization covers the request’s valid causal context, not each physical block independently.
 
 The reservation example compares a simplified 12-slot-per-request policy with block allocation. It is not a benchmark. Blocks avoid external fragmentation within a uniform pool, but the final block can still have unused slots. Larger blocks trade allocation granularity for other implementation costs; the playground does not model throughput, eviction, retained prefix caches, scheduling, or device transfer. Copy-on-write is illustrated with forked continuations; production prefix-caching policies vary.
 
@@ -80,6 +86,8 @@ The reservation example compares a simplified 12-slot-per-request policy with bl
 scenes/paged_attention.py   Six original Manim scene classes
 scripts/render.py          Video assembly and timed web assets
 scripts/serve.py           Local preview with video byte-range support
+scripts/build_typography.py Font bundling and LaTeX SVG generation
+scripts/review_frames.py   Authored frame extraction for visual QA
 docs/                      Self-contained GitHub Pages site
 docs/allocator.js          Deterministic KV block allocator
 docs/assets/               Rendered film, poster, captions, metadata
