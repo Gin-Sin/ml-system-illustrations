@@ -17,6 +17,10 @@ A six-chapter, silent, captioned visual essay inspired by 3Blue1Brown’s geomet
 
 The web page includes chapter navigation, a searchable browser-native text transcript, downloadable MP4, WebVTT captions, and a responsive allocator playground. Fork a request and append to see reference counting and copy-on-write. A four-token block is chosen for legibility, not as a production recommendation. The playground also supports eight-token blocks.
 
+The interactive diagram uses **[manim-web](https://github.com/maloyan/manim-web) 0.3.24**, a community TypeScript implementation of Manim's scene and animation model. `Scene`, `VGroup`, `Rectangle`, `Text`, `Clickable`, `Shift`, `Indicate`, and `FadeOut` render and animate live objects in the browser. Click a token, trace its address, or append to a fork: the shared tail is copied, the table is redirected, and the new KV entry arrives at its destination. These are live animations driven by the allocator state, not video clips.
+
+The film and exported equation SVGs use **Python Manim Community**. The playground uses the **browser port**, not a running Python Manim interpreter. `docs/allocator.js` supplies the allocation rules; HTML controls provide keyboard access and a matching text view. All runtime assets are hosted on this site, with no rendering server or CDN dependency. WebGL is required for the animated view; the text view remains interactive when WebGL is unavailable. Reduced-motion preferences disable transitions by default.
+
 ## Reproduce the animation
 
 Python 3.12, Manim Community 0.19.0, FFmpeg, Cairo, Pango, LaTeX, and dvisvgm are used. No GPU is needed. On Ubuntu/Debian:
@@ -48,12 +52,16 @@ Visual references: [3Blue1Brown’s attention lesson and video frames](https://w
 ## Develop the site
 
 ```sh
+npm ci
+npm run build
 python3 scripts/serve.py
 # Open http://localhost:8000
 npm test
 ```
 
-No frontend build step or runtime dependencies. The preview server supports HTTP byte ranges so chapter seeking works before the full video downloads. GitHub Pages supports these natively. The allocator tests cover physical address translation, partial-block copy-on-write isolation, shared full blocks, reference-counted release, atomic allocation failure, and 2,400 deterministic mixed operations across two block sizes.
+Node 22 builds `web/playground.js` into a local browser bundle using esbuild. Dependency versions are locked in `package-lock.json`; bundled license notices live in `docs/assets/playground/LICENSES.txt`. Run `npm run build` after editing the scene. The generated bundle is checked in for immediate local previews and rebuilt during deployment.
+
+The preview server supports HTTP byte ranges so chapter seeking works before the full video downloads. GitHub Pages supports these natively. The allocator tests cover physical address translation, partial-block copy-on-write isolation, shared full blocks, reference-counted release, atomic allocation failure, and 2,400 deterministic mixed operations across two block sizes. Browser checks exercise the actual canvas, token clicks, changing animation frames, action locking, allocation/release, reduced motion, WebGL fallback, responsive layouts, and movie playback.
 
 Optional browser checks (uses Playwright Chromium):
 
@@ -84,6 +92,8 @@ The reservation example compares a simplified 12-slot-per-request policy with bl
 
 ```text
 scenes/paged_attention.py   Six original Manim scene classes
+web/playground.js          Live manim-web scene and action animations
+scripts/build_web.mjs      Browser bundling and dependency notices
 scripts/render.py          Video assembly and timed web assets
 scripts/serve.py           Local preview with video byte-range support
 scripts/build_typography.py Font bundling and LaTeX SVG generation
@@ -91,6 +101,7 @@ scripts/review_frames.py   Authored frame extraction for visual QA
 docs/                      Self-contained GitHub Pages site
 docs/allocator.js          Deterministic KV block allocator
 docs/assets/               Rendered film, poster, captions, metadata
+docs/assets/playground/    Self-hosted browser animation runtime
 tests/                     Model invariants and browser checks
 .github/workflows/          Validation and Pages deployment
 ```

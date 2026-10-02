@@ -22,8 +22,8 @@
     />
     <title>PagedAttention — ML Systems, Illustrated</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="style.css?v=2" />
-    <script type="module" src="app.js?v=2"></script>
+    <link rel="stylesheet" href="style.css?v=3" />
+    <script type="module" src="app.js?v=3"></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -153,6 +153,20 @@
             ><button id="release">Finish request</button
             ><span id="request-length" class="quiet"></span>
           </div>
+          <div class="scene-controls">
+            <div class="lookup-control">
+              <label for="token">Inspect token <output id="token-value" for="token">0</output></label>
+              <input id="token" type="range" min="0" max="5" value="0" />
+            </div>
+            <button id="trace">Trace address</button>
+            <label class="motion-toggle"><input id="animate" type="checkbox" checked /> Animate changes</label>
+          </div>
+          <div id="manim-stage" aria-describedby="motion-caption" data-state="loading">
+            <p class="scene-loading">Preparing the memory scene…</p>
+          </div>
+          <p id="motion-caption" class="motion-caption" role="status">Loading the interactive scene.</p>
+          <details id="memory-data" class="memory-data">
+            <summary>View memory as text</summary>
           <div class="memory-stage">
             <div class="logical-panel">
               <div class="diagram-label">
@@ -162,12 +176,6 @@
                 Token order within the selected request
               </p>
               <div id="logical-blocks"></div>
-              <div class="lookup-control">
-                <label for="token"
-                  >Inspect token
-                  <output id="token-value" for="token">0</output></label
-                ><input id="token" type="range" min="0" max="5" value="0" />
-              </div>
             </div>
             <div class="table-panel">
               <div class="diagram-label">02 / BLOCK TABLE</div>
@@ -190,6 +198,7 @@
               </div>
             </div>
           </div>
+          </details>
           <div id="address" class="address" aria-live="polite"></div>
           <div class="metrics">
             <div>
@@ -216,6 +225,7 @@
           caches store vectors for multiple layers and KV heads. Block sizes and
           sharing policies depend on the engine; this model uses reference
           counts and copy-on-write, with no eviction or prefix-cache retention.
+          Labels above physical blocks show their request owners and reference count.
         </p>
       </section>
 

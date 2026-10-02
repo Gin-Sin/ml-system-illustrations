@@ -499,6 +499,76 @@ video {
   padding: 16px 24px 28px;
   min-height: 300px;
 }
+.scene-controls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 24px 22px;
+  flex-wrap: wrap;
+}
+.scene-controls .lookup-control {
+  flex: 1;
+  min-width: 140px;
+  max-width: 350px;
+  margin: 0;
+}
+.scene-controls button {
+  color: var(--gold);
+  background: transparent;
+  border: 1px solid var(--line);
+  padding: 10px 15px;
+  border-radius: 4px;
+  font: 11px var(--font-interface);
+}
+.motion-toggle {
+  font: 11px var(--font-interface);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+.motion-toggle input { accent-color: var(--teal); }
+#manim-stage {
+  background: #000;
+  width: 100%;
+  min-width: 0;
+  height: 500px;
+  overflow: hidden;
+}
+#manim-stage canvas {
+  display: block;
+  max-width: 100%;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+.scene-loading {
+  text-align: center;
+  padding: 90px 24px;
+  font: 22px var(--font-narrative);
+  color: var(--muted);
+}
+.motion-caption {
+  margin: 0;
+  min-height: 55px;
+  padding: 15px 24px;
+  color: var(--ink);
+  background: #000;
+  font: 17px/1.5 var(--font-narrative);
+}
+.memory-data { border-top: 1px solid var(--line); }
+.memory-data summary {
+  padding: 16px 24px;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+}
+@media (max-width: 540px) {
+  .scene-controls { gap: 16px; padding: 0 16px 20px; }
+  .motion-toggle { margin-left: 0; }
+  .motion-caption { font-size: 15px; padding: 12px 16px; }
+  #manim-stage { height: 560px; }
+}
 .diagram-label {
   font-size: 9px;
   letter-spacing: 0.8px;

@@ -3,6 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "node scripts/build_web.mjs",
     "test": "node --test tests/allocator.test.js"
+  },
+  "dependencies": {
+    "manim-web": "0.3.24"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12"
   }
 }

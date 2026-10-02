@@ -5,6 +5,48 @@ const colors = { A: "#58c4dd", B: "#c792ea", C: "#5cd0b3", D: "#f28d9b" };
 let model = new Allocator(),
   selected = "A",
   token = 0;
+let playground = null, busy = false;
+$("animate").checked = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function snapshot() {
+  return {
+    selected, token, blockSize: model.blockSize,
+    requests: [...model.requests].map(([id, r]) => ({ id, length: r.length, table: [...r.table] })),
+    pool: model.pool.map((p, i) => ({ tokens: [...p.tokens], refs: p.refs, owners: model.owners(i) })),
+  };
+}
+
+function setBusy(value) {
+  busy = value;
+  $("manim-stage").setAttribute("aria-busy", String(value));
+  for (const control of document.querySelectorAll(".lab-toolbar button, .lab-toolbar select, .actions button, .scene-controls input, .scene-controls button, #block-table button")) {
+    control.disabled = value;
+  }
+  if (!value) render();
+}
+
+function useTextView(error) {
+  console.error("Interactive scene unavailable", error);
+  playground?.dispose();
+  playground = null;
+  $("manim-stage").replaceChildren();
+  $("manim-stage").style.height = "0";
+  $("manim-stage").dataset.state = "unavailable";
+  $("memory-data").open = true;
+  $("motion-caption").textContent = "The animated view is unavailable in this browser. You can still explore every operation in the text view below.";
+}
+
+async function updateScene(before, action) {
+  if (!playground) return;
+  setBusy(true);
+  try {
+    await playground.transition(before, snapshot(), action, $("animate").checked);
+  } catch (error) {
+    useTextView(error);
+  } finally {
+    setBusy(false);
+  }
+}
 
 function cells(tokens, size, color, activeOffset = -1) {
   return `<div class="cells" style="--request-color:${color}">${Array.from(
@@ -71,40 +113,51 @@ function render() {
   $("metric-shared").textContent = stats.shared;
   for (const action of ["append", "fork", "release"]) $(action).disabled = !r;
   $("fork").disabled = !r || model.requests.size >= 4;
+  $("trace").disabled = !r?.length || !playground;
+  if (busy) setBusy(true);
 }
-function act(callback) {
+async function act(callback, action) {
+  if (busy) return;
+  const before = snapshot();
   try {
     $("event").textContent = callback();
   } catch (error) {
     $("event").textContent = error.message;
+    render();
+    return;
   }
   render();
+  await updateScene(before, action);
 }
 $("requests").addEventListener("click", (e) => {
   const button = e.target.closest("[data-request]");
-  if (button) {
+  if (button && !busy) {
     selected = button.dataset.request;
     token = 0;
     render();
+    playground?.draw(snapshot());
   }
 });
 $("block-table").addEventListener("click", (e) => {
   const button = e.target.closest("[data-logical]");
-  if (button) {
+  if (button && !busy) {
     token = Number(button.dataset.logical) * model.blockSize;
     render();
+    playground?.draw(snapshot());
   }
 });
 $("token").addEventListener("input", (e) => {
+  if (busy) return;
   token = Number(e.target.value);
   render();
+  playground?.draw(snapshot());
 });
 $("append").addEventListener("click", () =>
   act(() => {
     const event = model.append(selected);
     token = model.get(selected).length - 1;
     return event;
-  }),
+  }, "append"),
 );
 $("fork").addEventListener("click", () =>
   act(() => {
@@ -112,7 +165,7 @@ $("fork").addEventListener("click", () =>
       next = model.fork(source);
     selected = next;
     return `Forked ${source} → ${next}. Both share ${model.get(next).table.length} blocks. Append to see copy-on-write.`;
-  }),
+  }, "fork"),
 );
 $("release").addEventListener("click", () =>
   act(() => {
@@ -121,19 +174,52 @@ $("release").addEventListener("click", () =>
     selected = model.requests.keys().next().value;
     token = 0;
     return `Finished ${old}. Released ${freed} physical block${freed === 1 ? "" : "s"}; blocks referenced by other requests stay allocated.`;
-  }),
+  }, "release"),
 );
 function reset() {
+  if (busy) return;
   model = new Allocator(Number($("block-size").value));
   selected = "A";
   token = 0;
   $("event").textContent =
     "Reset. A has six tokens; B has three. Append to A, or fork it to share the prefix.";
   render();
+  playground?.draw(snapshot());
 }
 $("reset").addEventListener("click", reset);
 $("block-size").addEventListener("change", reset);
 render();
+$("trace").addEventListener("click", () => { if (!busy) void updateScene(snapshot(), "lookup"); });
+
+async function initializePlayground() {
+  try {
+    const [{ PagedAttentionPlayground }] = await Promise.all([
+      import("./assets/playground/scene.js?v=3"),
+      document.fonts.load('24px "CMU Serif"'),
+      document.fonts.load('24px "JetBrains Mono"'),
+    ]);
+    $("manim-stage").replaceChildren();
+    playground = new PagedAttentionPlayground($("manim-stage"), {
+      onToken(value) {
+        if (busy) return;
+        token = value;
+        render();
+        playground.draw(snapshot());
+      },
+      onPhase(text) { $("motion-caption").textContent = text; },
+    });
+    playground.draw(snapshot());
+    $("motion-caption").textContent = "Click a token or block-table entry to inspect its address.";
+    $("manim-stage").querySelector("canvas").addEventListener("webglcontextlost", () => {
+      useTextView(new Error("WebGL context lost"));
+      render();
+    }, { once: true });
+    render();
+  } catch (error) {
+    useTextView(error);
+  }
+}
+void initializePlayground();
 
 const video = $("film-player");
 const shortTitles = [

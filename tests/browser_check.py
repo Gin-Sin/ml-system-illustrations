@@ -7,6 +7,8 @@ import os
 import sys
 from pathlib import Path
 from playwright.sync_api import sync_playwright, expect
+from PIL import Image, ImageChops
+from io import BytesIO
 
 url = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8000"
 out = Path(__file__).resolve().parents[1] / "test-results"
@@ -25,8 +27,13 @@ with sync_playwright() as p:
     page = browser.new_page(viewport={"width":1440,"height":1000}, reduced_motion="reduce")
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
+    page.on("console", lambda message: errors.append(message.text) if message.type == "error" else None)
     response = page.goto(url, wait_until="networkidle")
     assert response.status == 200
+    page.wait_for_function("document.querySelector('#manim-stage').dataset.state === 'ready'")
+    expect(page.locator("#manim-stage")).to_have_attribute("data-engine", "manim-web")
+    expect(page.locator("#manim-stage canvas")).to_have_count(1)
+    expect(page.locator("#animate")).not_to_be_checked()
     page.evaluate("document.fonts.ready")
     narrative_font = page.locator("h1").evaluate("e => getComputedStyle(e).fontFamily")
     code_font = page.locator(".address").evaluate("e => getComputedStyle(e).fontFamily")
@@ -100,6 +107,66 @@ with sync_playwright() as p:
     page.locator("#block-size").select_option("4")
     page.evaluate("scrollTo(0,0)")
     page.screenshot(path=str(out / "mobile.png"),full_page=True)
+
+    # Exercise the actual Manim canvas and timed animation path, with motion enabled.
+    page.set_viewport_size({"width":1440,"height":1000})
+    page.locator("#reset").click()
+    canvas = page.locator("#manim-stage canvas")
+    page.wait_for_function("document.querySelector('#manim-stage canvas').clientWidth > 1000")
+    bounds = canvas.bounding_box()
+    canvas.click(position={"x":bounds["width"] * (0.5 - 4.2625 / 14),
+                           "y":bounds["height"] * (0.5 - 2.15 / 7.8)})
+    expect(page.locator("#address")).to_contain_text("P7[2]")
+    canvas.click(position={"x":bounds["width"] * (0.5 + 0.95 / 14),
+                           "y":bounds["height"] * (0.5 - 1.08 / 7.8)})
+    expect(page.locator("#address")).to_contain_text("P2[0]")
+    page.locator("#animate").check()
+    page.locator("#trace").click()
+    expect(page.locator("#manim-stage")).to_have_attribute("aria-busy", "true")
+    expect(page.locator("#append")).to_be_disabled()
+    page.wait_for_function("document.querySelector('#manim-stage').dataset.state === 'ready'")
+    page.locator("#fork").click()
+    page.wait_for_function("document.querySelector('#manim-stage').dataset.state === 'ready'")
+    page.locator("#append").click()
+    expect(page.locator("#motion-caption")).to_contain_text("Copy P2 into P5")
+    expect(page.locator("#reset")).to_be_disabled()
+    first = canvas.screenshot()
+    page.wait_for_timeout(220)
+    second = canvas.screenshot()
+    difference = ImageChops.difference(Image.open(BytesIO(first)).convert("RGB"), Image.open(BytesIO(second)).convert("RGB"))
+    assert difference.getbbox(), "The Manim scene did not animate during copy-on-write"
+    (out / "manim-cow-moving.png").write_bytes(second)
+    page.wait_for_function("document.querySelector('#manim-stage').dataset.state === 'ready'")
+    expect(page.locator("#address")).to_contain_text("P5[2]")
+    expect(page.locator("#metric-shared")).to_have_text("1")
+    page.locator("#release").click()
+    page.wait_for_function("document.querySelector('#manim-stage').dataset.state === 'ready'")
+    page.locator("#reset").click()
+    for _ in range(3):
+        page.locator("#append").click()
+        page.wait_for_function("document.querySelector('#manim-stage').dataset.state === 'ready'")
+    expect(page.locator("#address")).to_contain_text("P5[0]")
+    page.locator("#manim-stage").screenshot(path=str(out / "manim-desktop.png"))
+    page.locator("#animate").uncheck()
+    page.set_viewport_size({"width":390,"height":844})
+    page.locator("#reset").click()
+    page.wait_for_function("document.querySelector('#manim-stage canvas').clientWidth < 400")
+    page.locator("#manim-stage").screenshot(path=str(out / "manim-mobile.png"))
+
+    # GPU failure must leave the allocator, text view, and movie usable.
+    fallback = browser.new_page()
+    fallback.add_init_script("""const original = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function(kind, ...args) {
+        return kind.startsWith('webgl') ? null : original.call(this, kind, ...args);
+      };""")
+    fallback.goto(url, wait_until="networkidle")
+    expect(fallback.locator("#manim-stage")).to_have_attribute("data-state", "unavailable")
+    expect(fallback.locator("#memory-data")).to_have_attribute("open", "")
+    fallback.locator("#fork").click()
+    fallback.locator("#append").click()
+    expect(fallback.locator("#address")).to_contain_text("P5[2]")
+    expect(fallback.locator(".chapter")).to_have_count(6)
+    fallback.close()
     assert not errors, errors
-    print(f"PASS: distinct narrative/code fonts, LaTeX SVGs, allocator controls, full-pool handling, keyboard input, six video seeks, transcript, and five responsive widths. Video: {metadata}")
+    print(f"PASS: live Manim canvas, token clicks, animated lookup/copy-on-write/allocation/release, input locking, reduced motion, GPU fallback, fonts, allocator controls, full pool, keyboard input, six video seeks, transcript, and five responsive widths. Video: {metadata}")
     browser.close()

@@ -23,6 +23,10 @@ jobs:
           node-version: "22"
       - name: Check allocator invariants
         run: npm test
+      - name: Install pinned browser dependencies
+        run: npm ci
+      - name: Build the interactive Manim scene
+        run: npm run build
       - name: Verify published assets
         run: |
           test -s docs/assets/paged-attention.mp4
@@ -34,6 +38,8 @@ jobs:
           test -s docs/assets/tail-bound.svg
           test -s docs/assets/fonts/cmu-serif-regular.woff2
           test -s docs/assets/fonts/jetbrains-mono-regular.woff2
+          test -s docs/assets/playground/scene.js
+          test -s docs/assets/playground/LICENSES.txt
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
