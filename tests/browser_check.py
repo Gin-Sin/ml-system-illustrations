@@ -9,6 +9,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright, expect
 from PIL import Image, ImageChops
 from io import BytesIO
+from base64 import b64decode
 
 url = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8000"
 out = Path(__file__).resolve().parents[1] / "test-results"
@@ -81,6 +82,7 @@ with sync_playwright() as p:
     page.wait_for_function("document.querySelector('video').readyState >= 1")
     metadata = page.locator("video").evaluate("v => ({duration:v.duration,width:v.videoWidth,height:v.videoHeight})")
     assert metadata["duration"] > 100, metadata
+    expect(page.locator(".film-meta")).to_contain_text("NARRATED")
     for i in range(6):
         chapter = page.locator(".chapter").nth(i)
         target = float(chapter.get_attribute("data-start"))
@@ -88,6 +90,30 @@ with sync_playwright() as p:
         page.wait_for_function("t => {const v=document.querySelector('video');return v.readyState>=2 && !v.seeking && v.currentTime>=t && v.currentTime<t+3}",arg=target)
         page.locator("video").evaluate("v => v.pause()")
         expect(chapter).to_have_class("chapter active")
+    # Verify decoded audio reaches the browser's audio graph, not just an MP4 audio header.
+    audio_level = page.evaluate("""async () => {
+      const video = document.querySelector('video');
+      const context = new AudioContext();
+      const source = context.createMediaElementSource(video);
+      const analyser = context.createAnalyser();
+      source.connect(analyser);
+      analyser.connect(context.destination);
+      await context.resume();
+      video.currentTime = 2;
+      video.muted = false;
+      await video.play();
+      let peakRms = 0;
+      const samples = new Float32Array(analyser.fftSize);
+      for (let i = 0; i < 16; i++) {
+        await new Promise(resolve => setTimeout(resolve, 75));
+        analyser.getFloatTimeDomainData(samples);
+        peakRms = Math.max(peakRms, Math.sqrt(samples.reduce((sum, value) => sum + value * value, 0) / samples.length));
+      }
+      video.pause();
+      await context.close();
+      return peakRms;
+    }""")
+    assert audio_level > .01, f"Browser audio is silent: {audio_level}"
     page.locator(".transcript summary").click()
     expect(page.locator("#transcript-content h3")).to_have_count(6)
     assert page.locator("#transcript-content p").count() >= 20
@@ -127,12 +153,22 @@ with sync_playwright() as p:
     page.wait_for_function("document.querySelector('#manim-stage').dataset.state === 'ready'")
     page.locator("#fork").click()
     page.wait_for_function("document.querySelector('#manim-stage').dataset.state === 'ready'")
-    page.locator("#append").click()
-    expect(page.locator("#motion-caption")).to_contain_text("Copy P2 into P5")
-    expect(page.locator("#reset")).to_be_disabled()
-    first = canvas.screenshot()
-    page.wait_for_timeout(220)
-    second = canvas.screenshot()
+    # Capture inside animation frames. Locator screenshots can wait until a short
+    # transition has finished while scrolling the tall scene into view.
+    page.locator("#manim-stage").scroll_into_view_if_needed()
+    frames = page.evaluate("""async () => {
+      const canvas = document.querySelector('#manim-stage canvas');
+      const capture = () => new Promise(resolve => requestAnimationFrame(() => resolve(canvas.toDataURL('image/png'))));
+      document.querySelector('#append').click();
+      const caption = document.querySelector('#motion-caption').textContent;
+      const locked = document.querySelector('#reset').disabled;
+      const first = await capture();
+      await new Promise(resolve => setTimeout(resolve, 180));
+      return {first, second: await capture(), caption, locked};
+    }""")
+    assert "Copy P2 into P5" in frames["caption"] and frames["locked"]
+    first = b64decode(frames["first"].split(",", 1)[1])
+    second = b64decode(frames["second"].split(",", 1)[1])
     difference = ImageChops.difference(Image.open(BytesIO(first)).convert("RGB"), Image.open(BytesIO(second)).convert("RGB"))
     assert difference.getbbox(), "The Manim scene did not animate during copy-on-write"
     (out / "manim-cow-moving.png").write_bytes(second)
@@ -168,5 +204,5 @@ with sync_playwright() as p:
     expect(fallback.locator(".chapter")).to_have_count(6)
     fallback.close()
     assert not errors, errors
-    print(f"PASS: live Manim canvas, token clicks, animated lookup/copy-on-write/allocation/release, input locking, reduced motion, GPU fallback, fonts, allocator controls, full pool, keyboard input, six video seeks, transcript, and five responsive widths. Video: {metadata}")
+    print(f"PASS: audible narration (RMS {audio_level:.3f}), live Manim canvas, token clicks, animated lookup/copy-on-write/allocation/release, input locking, reduced motion, GPU fallback, fonts, allocator controls, full pool, keyboard input, six video seeks, transcript, and five responsive widths. Video: {metadata}")
     browser.close()

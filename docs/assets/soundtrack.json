@@ -1,0 +1,339 @@
+{
+  "voice": "en-US-AndrewNeural",
+  "rate": "-8%",
+  "engine": "edge-tts 7.2.8",
+  "duration": 144.9,
+  "sample_rate": 48000,
+  "channels": 2,
+  "loudness_lufs": -16.01,
+  "true_peak_dbtp": -2.47,
+  "speech": [
+    {
+      "cue": 0,
+      "start": 1.16,
+      "end": 6.54,
+      "tempo": 1.0,
+      "source": "audio/voice/0685746c195cd800.mp3"
+    },
+    {
+      "cue": 1,
+      "start": 8.91,
+      "end": 15.33,
+      "tempo": 1.0,
+      "source": "audio/voice/134ee208511f28cf.mp3"
+    },
+    {
+      "cue": 2,
+      "start": 15.76,
+      "end": 22.8,
+      "tempo": 1.0,
+      "source": "audio/voice/50614cd08774eed1.mp3"
+    },
+    {
+      "cue": 3,
+      "start": 26.61,
+      "end": 32.993,
+      "tempo": 1.04082,
+      "source": "audio/voice/47add5d49f240361.mp3"
+    },
+    {
+      "cue": 4,
+      "start": 33.36,
+      "end": 39.42,
+      "tempo": 1.0,
+      "source": "audio/voice/37cc98fc32fc6365.mp3"
+    },
+    {
+      "cue": 5,
+      "start": 39.91,
+      "end": 48.279,
+      "tempo": 1.04659,
+      "source": "audio/voice/703562d035c69721.mp3"
+    },
+    {
+      "cue": 6,
+      "start": 49.66,
+      "end": 56.32,
+      "tempo": 1.0,
+      "source": "audio/voice/19274f0daafb8775.mp3"
+    },
+    {
+      "cue": 7,
+      "start": 57.41,
+      "end": 62.02,
+      "tempo": 1.0,
+      "source": "audio/voice/acb4d99a53972580.mp3"
+    },
+    {
+      "cue": 8,
+      "start": 62.66,
+      "end": 69.58,
+      "tempo": 1.0,
+      "source": "audio/voice/238cb9fa7db992c0.mp3"
+    },
+    {
+      "cue": 9,
+      "start": 71.21,
+      "end": 79.78,
+      "tempo": 1.0,
+      "source": "audio/voice/a38fbf01244098af.mp3"
+    },
+    {
+      "cue": 10,
+      "start": 81.76,
+      "end": 88.84,
+      "tempo": 1.0,
+      "source": "audio/voice/e4b37873362ace82.mp3"
+    },
+    {
+      "cue": 11,
+      "start": 89.41,
+      "end": 95.882,
+      "tempo": 1.03709,
+      "source": "audio/voice/5f4c02d963441119.mp3"
+    },
+    {
+      "cue": 12,
+      "start": 97.26,
+      "end": 102.05,
+      "tempo": 1.0,
+      "source": "audio/voice/ad5763bb8bcd3b4c.mp3"
+    },
+    {
+      "cue": 13,
+      "start": 103.01,
+      "end": 106.5,
+      "tempo": 1.0,
+      "source": "audio/voice/366368da47ce72b3.mp3"
+    },
+    {
+      "cue": 14,
+      "start": 107.06,
+      "end": 112.92,
+      "tempo": 1.0,
+      "source": "audio/voice/a16f64402dc80116.mp3"
+    },
+    {
+      "cue": 15,
+      "start": 113.71,
+      "end": 119.34,
+      "tempo": 1.0,
+      "source": "audio/voice/1db1d43f770af812.mp3"
+    },
+    {
+      "cue": 16,
+      "start": 120.86,
+      "end": 126.932,
+      "tempo": 1.00988,
+      "source": "audio/voice/58ceb8f8f6d6fd33.mp3"
+    },
+    {
+      "cue": 17,
+      "start": 127.31,
+      "end": 132.46,
+      "tempo": 1.0,
+      "source": "audio/voice/310605efbe7ce9d4.mp3"
+    },
+    {
+      "cue": 18,
+      "start": 132.86,
+      "end": 137.74,
+      "tempo": 1.0,
+      "source": "audio/voice/951a47506a599dfd.mp3"
+    },
+    {
+      "cue": 19,
+      "start": 138.21,
+      "end": 142.38,
+      "tempo": 1.0,
+      "source": "audio/voice/0b0afc625a9489ca.mp3"
+    }
+  ],
+  "effects": [
+    {
+      "cue": 0,
+      "offset": 0.6,
+      "kind": "tick",
+      "pan": -0.45,
+      "time": 1.6000000000000014
+    },
+    {
+      "cue": 0,
+      "offset": 1.2,
+      "kind": "tick",
+      "pan": -0.15,
+      "time": 2.200000000000001
+    },
+    {
+      "cue": 0,
+      "offset": 1.8,
+      "kind": "tick",
+      "pan": 0.15,
+      "time": 2.8000000000000016
+    },
+    {
+      "cue": 1,
+      "offset": 1.8,
+      "kind": "write",
+      "pan": 0.4,
+      "time": 10.549999999999983
+    },
+    {
+      "cue": 2,
+      "offset": 3.8,
+      "kind": "resolve",
+      "pan": 0,
+      "time": 19.400000000000173
+    },
+    {
+      "cue": 4,
+      "offset": 2.1,
+      "kind": "copy",
+      "pan": 0,
+      "time": 35.29999999999999
+    },
+    {
+      "cue": 5,
+      "offset": 1.4,
+      "kind": "resolve",
+      "pan": 0.3,
+      "time": 41.15000000000015
+    },
+    {
+      "cue": 6,
+      "offset": 3.3,
+      "kind": "tick",
+      "pan": 0.25,
+      "time": 52.8
+    },
+    {
+      "cue": 6,
+      "offset": 4.5,
+      "kind": "tick",
+      "pan": 0.25,
+      "time": 54.0
+    },
+    {
+      "cue": 6,
+      "offset": 5.7,
+      "kind": "tick",
+      "pan": 0.25,
+      "time": 55.2
+    },
+    {
+      "cue": 8,
+      "offset": 0.4,
+      "kind": "trace",
+      "pan": 0.25,
+      "time": 62.90000000000019
+    },
+    {
+      "cue": 8,
+      "offset": 1.6,
+      "kind": "write",
+      "pan": 0.3,
+      "time": 64.1000000000002
+    },
+    {
+      "cue": 10,
+      "offset": 3.3,
+      "kind": "resolve",
+      "pan": 0,
+      "time": 84.90000000000005
+    },
+    {
+      "cue": 12,
+      "offset": 3.5,
+      "kind": "write",
+      "pan": -0.3,
+      "time": 100.6
+    },
+    {
+      "cue": 13,
+      "offset": 1.3,
+      "kind": "write",
+      "pan": -0.3,
+      "time": 104.14999999999998
+    },
+    {
+      "cue": 14,
+      "offset": 2.7,
+      "kind": "allocate",
+      "pan": -0.3,
+      "time": 109.6
+    },
+    {
+      "cue": 14,
+      "offset": 3.5,
+      "kind": "write",
+      "pan": -0.3,
+      "time": 110.39999999999999
+    },
+    {
+      "cue": 15,
+      "offset": 0.45,
+      "kind": "release",
+      "pan": -0.15,
+      "time": 114.00000000000018
+    },
+    {
+      "cue": 16,
+      "offset": 3.1,
+      "kind": "resolve",
+      "pan": 0.2,
+      "time": 123.79999999999998
+    },
+    {
+      "cue": 17,
+      "offset": 0.45,
+      "kind": "copy",
+      "pan": 0.3,
+      "time": 127.59999999999998
+    },
+    {
+      "cue": 17,
+      "offset": 3.45,
+      "kind": "allocate",
+      "pan": 0.3,
+      "time": 130.59999999999997
+    },
+    {
+      "cue": 18,
+      "offset": 1.2,
+      "kind": "write",
+      "pan": 0.3,
+      "time": 133.90000000000015
+    },
+    {
+      "kind": "chapter",
+      "time": 0.13,
+      "pan": 0
+    },
+    {
+      "kind": "chapter",
+      "time": 25.58,
+      "pan": 0
+    },
+    {
+      "kind": "chapter",
+      "time": 48.63,
+      "pan": 0
+    },
+    {
+      "kind": "chapter",
+      "time": 70.17999999999999,
+      "pan": 0
+    },
+    {
+      "kind": "chapter",
+      "time": 96.22999999999999,
+      "pan": 0
+    },
+    {
+      "kind": "chapter",
+      "time": 119.83,
+      "pan": 0
+    }
+  ],
+  "sound_design": "Original synthesized ticks, writes, allocation tones, copy sweeps, releases, and chapter chimes; ducked below speech."
+}

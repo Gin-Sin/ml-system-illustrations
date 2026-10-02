@@ -239,7 +239,7 @@ function seek(start) {
 try {
   const [chapterResponse, transcriptResponse] = await Promise.all([
     fetch("assets/chapters.json?v=2"),
-    fetch("assets/transcript.json?v=2"),
+    fetch("assets/transcript.json?v=4"),
   ]);
   if (!chapterResponse.ok || !transcriptResponse.ok)
     throw new Error("Chapter metadata unavailable");

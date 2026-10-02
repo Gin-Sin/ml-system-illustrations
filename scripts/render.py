@@ -24,6 +24,7 @@ def main():
     parser.add_argument("--quality", choices=["l", "m", "h"], default="h")
     parser.add_argument("--fps", type=int, choices=[30, 60])
     parser.add_argument("--assemble-only", action="store_true")
+    parser.add_argument("--silent", action="store_true", help="Skip narration for a visual draft.")
     args = parser.parse_args()
     fps = args.fps or (30 if args.quality == "l" else 60)
     if not args.assemble_only:
@@ -52,11 +53,14 @@ def main():
     (assets / "captions.vtt").write_text("WEBVTT\n\n"+"\n\n".join(
         f"{stamp(c['start'])} --> {stamp(c['end'])}\n{c['text']}" for c in cues)+"\n")
     (assets / "transcript.json").write_text(json.dumps(cues,indent=2)+"\n")
+    (assets / "visual-cues.json").write_text(json.dumps(cues,indent=2)+"\n")
     mapping = json.loads((ROOT / "media/timings/BlockMapping.json").read_text())
     poster_time = next((f["time"] for f in mapping.get("review_frames", []) if f["name"] == "address-translation"), 10)
     run("ffmpeg","-y","-v","error","-ss",str(chapters[2]["start"]+poster_time+.25),"-i",str(assets / "paged-attention.mp4"),
         "-frames:v","1","-update","1",str(assets / "poster.jpg"))
     run(sys.executable, "scripts/build_typography.py")
+    if not args.silent:
+        run(sys.executable, "scripts/build_audio.py")
     print(f"Built {offset:.1f}s video, {len(chapters)} chapters, and {len(cues)} captions.")
 
 

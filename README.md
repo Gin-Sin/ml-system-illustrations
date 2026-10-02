@@ -6,7 +6,7 @@ Original Manim animations and interactive explanations of machine learning syste
 
 ## Visual note 001: PagedAttention
 
-A six-chapter, silent, captioned visual essay inspired by 3Blue1Brown’s geometric teaching approach. This is an independent project with original scenes, not an official 3Blue1Brown production.
+A six-chapter visual essay with English narration, original sound effects, and captions, inspired by 3Blue1Brown’s geometric teaching approach. This is an independent project with original scenes, not an official 3Blue1Brown production.
 
 1. Why the KV cache grows during autoregressive decoding.
 2. Reserving a maximum context versus allocating fixed-size blocks on demand.
@@ -33,7 +33,17 @@ python3 -m venv .venv
 .venv/bin/python scripts/render.py
 ```
 
-The default render is **1920 × 1080 at 60 fps**. The script renders six scenes, combines them into a browser-compatible H.264 MP4, and derives the chapter times, captions, transcript, and poster from the render. Captions also appear within the animation, so it works without audio or enabled subtitle tracks.
+The default render is **1920 × 1080 at 60 fps**. The script renders six scenes, combines them into a browser-compatible H.264 MP4, and derives the chapter times and poster from the render. It then mixes English narration and original sound effects into a stereo AAC track. The closed captions and searchable transcript match the spoken script; explanatory text also remains within the animation for viewing without sound.
+
+The narration uses the synthetic `en-US-AndrewNeural` voice through [edge-tts](https://github.com/rany2/edge-tts), at a relaxed base rate. `audio/narration.json` contains the authored script and visual event cues. Speech is aligned to the existing scenes, with only small timing adjustments; the mixer rejects lines that would need excessive acceleration. The soundtrack targets −16 LUFS with a −1.5 dB true-peak ceiling. Quiet synthesized ticks, allocation tones, copy sweeps, and release cues sit below the voice; there is no music bed.
+
+Generated voice clips are checked in under `audio/voice/`. Rebuild the soundtrack without requesting any new speech:
+
+```sh
+.venv/bin/python scripts/build_audio.py --offline
+```
+
+After editing the narration, omit `--offline` to synthesize changed lines using the online speech service. The rest of the mix is generated locally and deterministically. `docs/assets/visual-cues.json` preserves the visual timing source; `docs/assets/soundtrack.json` records speech intervals, effects, and measured loudness. Rebuilding audio copies the video stream unchanged. Use `scripts/render.py --silent` only for a visual draft.
 
 The visual system uses **CMU Serif** for narration, **JetBrains Mono** for code and physical addresses, and real **Computer Modern LaTeX** for mathematics. Serif labels, symbolic vectors, memory strips, restrained brackets, and data-linked highlights replace the original rounded-card diagrams. The website embeds the fonts locally and uses LaTeX SVGs for its takeaway equations. Font redistribution notices are included in `docs/assets/fonts/`.
 
@@ -57,6 +67,7 @@ npm run build
 python3 scripts/serve.py
 # Open http://localhost:8000
 npm test
+python3 tests/audio_check.py
 ```
 
 Node 22 builds `web/playground.js` into a local browser bundle using esbuild. Dependency versions are locked in `package-lock.json`; bundled license notices live in `docs/assets/playground/LICENSES.txt`. Run `npm run build` after editing the scene. The generated bundle is checked in for immediate local previews and rebuilt during deployment.
@@ -94,6 +105,9 @@ The reservation example compares a simplified 12-slot-per-request policy with bl
 scenes/paged_attention.py   Six original Manim scene classes
 web/playground.js          Live manim-web scene and action animations
 scripts/build_web.mjs      Browser bundling and dependency notices
+audio/narration.json       Narration script and sound-effect cues
+audio/voice/               Cached generated speech clips
+scripts/build_audio.py     Timed narration, original effects, and stereo mixing
 scripts/render.py          Video assembly and timed web assets
 scripts/serve.py           Local preview with video byte-range support
 scripts/build_typography.py Font bundling and LaTeX SVG generation

@@ -32,6 +32,8 @@ jobs:
           test -s docs/assets/paged-attention.mp4
           test -s docs/assets/chapters.json
           test -s docs/assets/captions.vtt
+          test -s docs/assets/soundtrack.json
+          test -s docs/assets/visual-cues.json
           test -s docs/assets/poster.jpg
           test -s docs/assets/logical-block.svg
           test -s docs/assets/weighted-sum.svg
@@ -41,6 +43,10 @@ jobs:
           test -s docs/assets/playground/scene.js
           test -s docs/assets/playground/LICENSES.txt
       - uses: actions/configure-pages@v5
+      - name: Verify narration and encoded audio
+        run: |
+          if ! command -v ffmpeg >/dev/null; then sudo apt-get update && sudo apt-get install -y ffmpeg; fi
+          python3 tests/audio_check.py
       - uses: actions/upload-pages-artifact@v4
         with:
           path: docs

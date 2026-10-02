@@ -1,0 +1,102 @@
+[
+  {
+    "start": 1.0000000000000013,
+    "end": 8.749999999999982,
+    "text": "Each token leaves behind two vectors: a key and a value. One attention head is shown here."
+  },
+  {
+    "start": 8.749999999999982,
+    "end": 15.600000000000174,
+    "text": "Decoding appends another key\u2013value pair. The earlier vectors stay in the cache."
+  },
+  {
+    "start": 15.600000000000174,
+    "end": 25.44999999999994,
+    "text": "The next query reuses this growing cache to compute attention over the available context."
+  },
+  {
+    "start": 26.45,
+    "end": 33.19999999999999,
+    "text": "Suppose each request reserves twelve token slots, even though its final length is unknown."
+  },
+  {
+    "start": 33.19999999999999,
+    "end": 39.75000000000015,
+    "text": "Cut the cache into blocks of four. Allocate only the blocks needed by the current tokens."
+  },
+  {
+    "start": 39.75000000000015,
+    "end": 48.5,
+    "text": "The same fourteen tokens now occupy twenty slots. Only the final block of each request has slack."
+  },
+  {
+    "start": 49.5,
+    "end": 57.249999999999986,
+    "text": "A block table connects the token sequence to physical memory. Matching colors follow the same data."
+  },
+  {
+    "start": 57.249999999999986,
+    "end": 62.50000000000019,
+    "text": "For token six, divide by the block size. The quotient chooses a block; the remainder chooses a slot."
+  },
+  {
+    "start": 62.50000000000019,
+    "end": 70.05,
+    "text": "Follow table[1] to physical block P2, then read slot 2. The logical token index is still six."
+  },
+  {
+    "start": 71.05,
+    "end": 81.60000000000005,
+    "text": "The query compares with every valid key, even when those keys are stored in different physical blocks."
+  },
+  {
+    "start": 81.60000000000005,
+    "end": 89.25000000000026,
+    "text": "Softmax normalizes all of these scores together. Physical block boundaries do not split the denominator."
+  },
+  {
+    "start": 89.25000000000026,
+    "end": 96.1,
+    "text": "Use these weights to mix the value vectors. Paging changes storage, while preserving the attention calculation."
+  },
+  {
+    "start": 97.1,
+    "end": 102.84999999999998,
+    "text": "At six tokens, the request owns two blocks. Appending token six writes into an existing slot."
+  },
+  {
+    "start": 102.84999999999998,
+    "end": 106.89999999999999,
+    "text": "Token seven fills the remaining slot. The block table is unchanged."
+  },
+  {
+    "start": 106.89999999999999,
+    "end": 113.55000000000018,
+    "text": "For token eight, the offset becomes zero. Allocate a free block, then extend the table."
+  },
+  {
+    "start": 113.55000000000018,
+    "end": 119.69999999999999,
+    "text": "After the request finishes, its unshared blocks return to the pool and can serve another request."
+  },
+  {
+    "start": 120.69999999999999,
+    "end": 127.14999999999998,
+    "text": "Two continuations can share prefix blocks. Reference counts record how many requests still need each block."
+  },
+  {
+    "start": 127.14999999999998,
+    "end": 132.70000000000016,
+    "text": "A is about to append into a shared partial block. First copy that block; then change only A\u2019s table."
+  },
+  {
+    "start": 132.70000000000016,
+    "end": 138.05000000000027,
+    "text": "Now A can write token six into its private copy. B\u2019s data stays unchanged, and the full prefix remains shared."
+  },
+  {
+    "start": 138.05000000000027,
+    "end": 144.89999999999998,
+    "text": "PagedAttention keeps token order intact while making GPU memory easier to allocate, reuse, and share."
+  }
+]
