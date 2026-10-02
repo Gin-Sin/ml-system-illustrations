@@ -33,9 +33,9 @@ python3 -m venv .venv
 .venv/bin/python scripts/render.py
 ```
 
-The default render is **1920 × 1080 at 60 fps**. The script renders six scenes, combines them into a browser-compatible H.264 MP4, and derives the chapter times and poster from the render. It then mixes English narration and original sound effects into a stereo AAC track. The closed captions and searchable transcript match the spoken script; explanatory text also remains within the animation for viewing without sound.
+The default render is **1920 × 1080 at 60 fps**. The script prepares narration, renders six scenes, combines them into a browser-compatible H.264 MP4, and derives the chapter times and poster from the render. It then mixes English narration and original sound effects into a stereo AAC track. **The on-screen narration, voice, closed captions, and searchable transcript all use the same sentences from `audio/narration.json`.**
 
-The narration uses the synthetic `en-US-AndrewNeural` voice through [edge-tts](https://github.com/rany2/edge-tts), at a relaxed base rate. `audio/narration.json` contains the authored script and visual event cues. Speech is aligned to the existing scenes, with only small timing adjustments; the mixer rejects lines that would need excessive acceleration. The soundtrack targets −16 LUFS with a −1.5 dB true-peak ceiling. Quiet synthesized ticks, allocation tones, copy sweeps, and release cues sit below the voice; there is no music bed.
+The narration uses the synthetic `en-US-AndrewNeural` voice through [edge-tts](https://github.com/rany2/edge-tts), at a relaxed base rate. Manim measures each complete spoken sentence and extends the scene's final hold when needed. Speech starts after the caption fades in, and the text stays visible until at least half a second after the voice finishes. No separate paraphrased script or speech acceleration is used. The soundtrack targets −16 LUFS with a −1.5 dB true-peak ceiling. Quiet synthesized ticks, allocation tones, copy sweeps, and release cues sit below the voice.
 
 Generated voice clips are checked in under `audio/voice/`. Rebuild the soundtrack without requesting any new speech:
 
@@ -43,7 +43,7 @@ Generated voice clips are checked in under `audio/voice/`. Rebuild the soundtrac
 .venv/bin/python scripts/build_audio.py --offline
 ```
 
-After editing the narration, omit `--offline` to synthesize changed lines using the online speech service. The rest of the mix is generated locally and deterministically. `docs/assets/visual-cues.json` preserves the visual timing source; `docs/assets/soundtrack.json` records speech intervals, effects, and measured loudness. Rebuilding audio copies the video stream unchanged. Use `scripts/render.py --silent` only for a visual draft.
+After editing the shared script, run `scripts/render.py` to synthesize changed lines and re-render matching text and timing. `scripts/build_audio.py --prepare-only` prepares the speech timing for direct Manim runs. The mix is generated locally from the cached clips. `docs/assets/visual-cues.json` records the rendered text and times; `docs/assets/soundtrack.json` records the matching speech, effects, and measured loudness. The audio-only rebuild copies the existing video stream and rejects any text or timing mismatch. Use `scripts/render.py --silent` only for a visual draft.
 
 The visual system uses **CMU Serif** for narration, **JetBrains Mono** for code and physical addresses, and real **Computer Modern LaTeX** for mathematics. Serif labels, symbolic vectors, memory strips, restrained brackets, and data-linked highlights replace the original rounded-card diagrams. The website embeds the fonts locally and uses LaTeX SVGs for its takeaway equations. Font redistribution notices are included in `docs/assets/fonts/`.
 
@@ -68,6 +68,8 @@ python3 scripts/serve.py
 # Open http://localhost:8000
 npm test
 python3 tests/audio_check.py
+# Optional frame-level text check (requires tesseract-ocr and its English data):
+python3 tests/caption_frames.py
 ```
 
 Node 22 builds `web/playground.js` into a local browser bundle using esbuild. Dependency versions are locked in `package-lock.json`; bundled license notices live in `docs/assets/playground/LICENSES.txt`. Run `npm run build` after editing the scene. The generated bundle is checked in for immediate local previews and rebuilt during deployment.

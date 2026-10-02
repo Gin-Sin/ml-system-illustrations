@@ -23,6 +23,8 @@ NARRATIVE_FONT = "CMU Serif"
 CODE_FONT = "JetBrains Mono"
 TEX_TEMPLATE = TexTemplate()
 TEX_TEMPLATE.add_to_preamble(r"\usepackage{xcolor}")
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+NARRATION = json.loads((PROJECT_ROOT / "audio/narration.json").read_text())
 
 
 def prose(text, size=30, color=INK, **kwargs):
@@ -94,6 +96,14 @@ class Chapter(Scene):
     heading = ""
 
     def setup(self):
+        timing_path = PROJECT_ROOT / "media/audio/narration-timing.json"
+        if not timing_path.exists():
+            raise RuntimeError("Run scripts/build_audio.py --prepare-only before rendering the scenes.")
+        timing = json.loads(timing_path.read_text())
+        assert [cue["text"] for cue in timing["cues"]] == NARRATION["cues"], "Prepared narration is stale."
+        assert (timing["voice"], timing["rate"]) == (NARRATION["voice"], NARRATION["rate"])
+        self.speech_durations = [cue["duration"] for cue in timing["cues"]]
+        self.current_cue = None
         self.camera.background_color = BG
         self.cues = []
         self.current_caption = None
@@ -108,7 +118,18 @@ class Chapter(Scene):
             self.title.scale_to_fit_width(12.6)
         self.play(FadeIn(self.title, shift=UP*.12), run_time=1)
 
-    def caption(self, text):
+    def hold_for_speech(self):
+        if self.current_cue is None:
+            return
+        required_end = self.current_start + NARRATION["speech_lead"] + self.speech_durations[self.current_cue] + NARRATION["end_pause"]
+        remaining = required_end - float(self.renderer.time)
+        if remaining > 1e-6:
+            self.wait(np.ceil(remaining * config.frame_rate) / config.frame_rate)
+
+    def caption(self, cue_index):
+        self.hold_for_speech()
+        text = NARRATION["cues"][cue_index]
+        self.current_cue = cue_index
         now = float(self.renderer.time)
         if self.current_text:
             self.cues.append({"start":self.current_start, "end":now, "text":self.current_text})
@@ -132,6 +153,7 @@ class Chapter(Scene):
 
     def finish(self):
         self.wait(2)
+        self.hold_for_speech()
         self.cues.append({"start":self.current_start,"end":float(self.renderer.time),"text":self.current_text})
         target = Path("media/timings")
         target.mkdir(parents=True, exist_ok=True)
@@ -145,7 +167,7 @@ class KVCache(Chapter):
     number, heading = "01", "What does the model remember?"
 
     def construct(self):
-        self.caption("Each token leaves behind two vectors: a key and a value. One attention head is shown here.")
+        self.caption(0)
         words = VGroup(*[prose(w, 35) for w in ["A", "small", "idea", "grows"]])
         positions = [-4.65, -1.55, 1.55, 4.65]
         keys, values, stems = VGroup(), VGroup(), VGroup()
@@ -161,14 +183,14 @@ class KVCache(Chapter):
         vlabel = prose("values", 27, TEAL).move_to([1.8,-1,0])
         self.play(FadeIn(klabel),FadeIn(vlabel),run_time=.6)
         self.wait(2.5)
-        self.caption("Decoding appends another key–value pair. The earlier vectors stay in the cache.")
+        self.caption(1)
         self.play(FadeIn(words[3]),GrowArrow(stems[3]),Write(keys[3]),Write(values[3]),run_time=2)
         cache_brace = Brace(VGroup(keys,values),DOWN,color=INK,buff=.35)
         cache_label = prose("the KV cache", 32).next_to(cache_brace,DOWN,buff=.12)
         self.play(FadeOut(klabel),FadeOut(vlabel),GrowFromCenter(cache_brace),Write(cache_label),run_time=1.5)
         self.mark("kv-vectors")
         self.wait(3)
-        self.caption("The next query reuses this growing cache to compute attention over the available context.")
+        self.caption(2)
         equation = formula(
             r"\mathbf{o}_t = \textcolor[HTML]{5CD0B3}{V_{\leq t}}\,\operatorname{softmax}\!\left(\frac{ \textcolor[HTML]{58C4DD}{K_{\leq t}^{\mathsf T}}\textcolor[HTML]{FFFF80}{\mathbf{q}_t} }{\sqrt{d_k}}\right)",
             size=52,
@@ -191,7 +213,7 @@ class Fragmentation(Chapter):
     number, heading = "02", "How much memory should we reserve?"
 
     def construct(self):
-        self.caption("Suppose each request reserves twelve token slots, even though its final length is unknown.")
+        self.caption(3)
         rows, names = VGroup(), VGroup()
         lengths, colors = [6,3,5],[BLUE,TEAL,PURPLE]
         for i,(n,c) in enumerate(zip(lengths,colors)):
@@ -203,7 +225,7 @@ class Fragmentation(Chapter):
         used = prose("used / reserved",23,MUTED).next_to(fraction,DOWN,buff=.3)
         self.play(Write(fraction),FadeIn(used),run_time=1.4)
         self.wait(3)
-        self.caption("Cut the cache into blocks of four. Allocate only the blocks needed by the current tokens.")
+        self.caption(4)
         splits=VGroup()
         for row in rows:
             for i in [4,8]:
@@ -221,7 +243,7 @@ class Fragmentation(Chapter):
                   TransformMatchingTex(fraction,formula(r"\frac{14}{20}",size=68).move_to(fraction)),
                   Transform(used,prose("used / allocated",23,TEAL).move_to(used)),run_time=2)
         self.wait(2)
-        self.caption("The same fourteen tokens now occupy twenty slots. Only the final block of each request has slack.")
+        self.caption(5)
         tail_boxes=VGroup(*[SurroundingRectangle(group[-1],color=GOLD,buff=.08,stroke_width=2) for group in blocks])
         self.play(LaggedStart(*[Create(box) for box in tail_boxes],lag_ratio=.2),run_time=1.3)
         bound=formula(r"0\leq",r"w_{\mathrm{tail}}",r"\leq B-1",size=45).move_to(DOWN*1.85)
@@ -238,7 +260,7 @@ class BlockMapping(Chapter):
     number, heading = "03", "Order and location are different things"
 
     def construct(self):
-        self.caption("A block table connects the token sequence to physical memory. Matching colors follow the same data.")
+        self.caption(6)
         colors=[BLUE,TEAL,PURPLE]
         logical=VGroup(*[MemoryBlock([t if t<10 else None for t in range(i*4,i*4+4)],c,width=2.65,height=.5)
                           .move_to([-4.65,1.45-i*1.15,0]) for i,c in enumerate(colors)])
@@ -264,7 +286,7 @@ class BlockMapping(Chapter):
                       addresses[p].animate.set_color(colors[i]),run_time=1.2)
             pool[p]=filled
         self.wait(2)
-        self.caption("For token six, divide by the block size. The quotient chooses a block; the remainder chooses a slot.")
+        self.caption(7)
         rule=formula(r"b=\left\lfloor\frac{t}{B}\right\rfloor",r",\qquad",r"r=t\bmod B",size=38).move_to(DOWN*2.2)
         self.play(Write(rule),run_time=1.6)
         concrete=formula(r"b=\left\lfloor\frac{6}{4}\right\rfloor=1",r",\qquad",r"r=6\bmod4=2",size=38).move_to(rule)
@@ -275,7 +297,7 @@ class BlockMapping(Chapter):
         self.play(Create(selected),paths[0].animate.set_opacity(.2),paths[2].animate.set_opacity(.2),
                   paths[1].animate.set_color(GOLD).set_stroke(width=3),run_time=.8)
         self.wait(1)
-        self.caption("Follow table[1] to physical block P2, then read slot 2. The logical token index is still six.")
+        self.caption(8)
         pulse=Dot(paths[1].get_start(),radius=.06,color=GOLD)
         self.add(pulse)
         self.play(MoveAlongPath(pulse,paths[1]),run_time=1.2,rate_func=linear)
@@ -291,7 +313,7 @@ class Attention(Chapter):
     number, heading = "04", "The addresses change. The mathematics stays."
 
     def construct(self):
-        self.caption("The query compares with every valid key, even when those keys are stored in different physical blocks.")
+        self.caption(9)
         xs=np.linspace(-4.2,5.25,10)
         colors=[BLUE]*4+[TEAL]*4+[PURPLE]*2
         keys=VGroup(*[formula(rf"\mathbf{{k}}_{{{i}}}",size=32,color=c).move_to([x,.5,0])
@@ -313,7 +335,7 @@ class Attention(Chapter):
                                                 for i in range(a,b)],lag_ratio=.15),run_time=1.5)
             self.play(FadeOut(route),run_time=.3)
         self.wait(2)
-        self.caption("Softmax normalizes all of these scores together. Physical block boundaries do not split the denominator.")
+        self.caption(10)
         norm=formula(r"\alpha_i=\frac{\exp(s_i)}{\sum_{j=0}^{t}\exp(s_j)}",size=47).scale_to_fit_height(1.12).move_to(UP*2.05)
         norm.set_color(GOLD)
         self.play(ReplacementTransform(score_rule,norm),FadeOut(query),run_time=1.4)
@@ -326,7 +348,7 @@ class Attention(Chapter):
         self.play(GrowFromCenter(shared),Write(shared_label),run_time=1.3)
         self.mark("global-softmax")
         self.wait(3)
-        self.caption("Use these weights to mix the value vectors. Paging changes storage, while preserving the attention calculation.")
+        self.caption(11)
         result=formula(r"\mathbf{o}_t=\sum\nolimits_{i=0}^{t}",r"\alpha_i",r"\mathbf{v}_i",size=46).scale_to_fit_height(.85).move_to(DOWN*2.55)
         result[1].set_color(GOLD); result[2].set_color(TEAL)
         self.play(Write(result),run_time=1.5)
@@ -339,7 +361,7 @@ class Allocation(Chapter):
     number, heading = "05", "Cross a boundary. Allocate one block."
 
     def construct(self):
-        self.caption("At six tokens, the request owns two blocks. Appending token six writes into an existing slot.")
+        self.caption(12)
         first=MemoryBlock([0,1,2,3],BLUE,width=3.65,height=.62,address="P7").move_to([-3.9,1.55,0])
         tail=MemoryBlock([4,5,None,None],BLUE,width=3.65,height=.62,address="P2").move_to([-3.9,.12,0])
         empty=MemoryBlock([None]*4,EDGE,width=3.65,height=.62,address="P5 · free").move_to([-3.9,-1.32,0])
@@ -359,11 +381,11 @@ class Allocation(Chapter):
         self.play(Create(cursor),run_time=.6)
         self.play(Transform(tail.contents[2],tail.put(2,6)),run_time=.8)
         self.wait(2)
-        self.caption("Token seven fills the remaining slot. The block table is unchanged.")
+        self.caption(13)
         next_state=code("t = 7   b = 1   r = 3",24,GOLD).move_to(current)
         self.play(Transform(current,next_state),Transform(tail.contents[3],tail.put(3,7)),run_time=1.2)
         self.wait(2.5)
-        self.caption("For token eight, the offset becomes zero. Allocate a free block, then extend the table.")
+        self.caption(14)
         boundary=code("t = 8   b = 2   r = 0",24,GOLD).move_to(current)
         self.play(Transform(current,boundary),Transform(cursor,SurroundingRectangle(code_lines[1:3],color=GOLD,buff=.12,stroke_width=1.2)),run_time=1.2)
         allocated=MemoryBlock([None]*4,BLUE,width=3.65,height=.62,address="P5").move_to(empty)
@@ -373,7 +395,7 @@ class Allocation(Chapter):
                   Transform(empty.contents[0],empty.put(0,8,BLUE)),run_time=.8)
         self.mark("code-and-allocation")
         self.wait(3)
-        self.caption("After the request finishes, its unshared blocks return to the pool and can serve another request.")
+        self.caption(15)
         release=code("release(table)",30,TEAL).move_to(code_lines)
         self.play(FadeOut(cursor),FadeOut(current),ReplacementTransform(code_lines,release),
                   *[Transform(block,MemoryBlock([None]*4,EDGE,width=3.65,height=.62,address=f"P{p} · free").move_to(block))
@@ -386,7 +408,7 @@ class Sharing(Chapter):
     number, heading = "06", "A shared past. Two different futures."
 
     def construct(self):
-        self.caption("Two continuations can share prefix blocks. Reference counts record how many requests still need each block.")
+        self.caption(16)
         a=VGroup(prose("Continuation A",28,BLUE),code("[7, 2]",23,BLUE)).arrange(DOWN,buff=.17).move_to([-4.95,1.1,0])
         b=VGroup(prose("Continuation B",28,PURPLE),code("[7, 2]",23,PURPLE)).arrange(DOWN,buff=.17).move_to([-4.95,-1.1,0])
         full=MemoryBlock([0,1,2,3],TEAL,width=2.6,height=.6,address="P7").move_to([-.5,1.15,0])
@@ -401,7 +423,7 @@ class Sharing(Chapter):
         self.play(FadeIn(a),FadeIn(b),FadeIn(full),FadeIn(tail),FadeIn(ref_full),FadeIn(ref_tail),run_time=1.6)
         self.play(LaggedStart(*[Create(r) for r in routes],lag_ratio=.18),run_time=1.5)
         self.wait(3)
-        self.caption("A is about to append into a shared partial block. First copy that block; then change only A’s table.")
+        self.caption(17)
         private=MemoryBlock([4,5,None,None],BLUE,width=2.6,height=.6,address="P5").move_to([3.6,-1.2,0])
         copy_arrow=arrow(tail.get_bottom()+DOWN*.32,private.get_top(),MUTED,1.4)
         copy_text=prose("copy",22,MUTED).next_to(copy_arrow,RIGHT,buff=.15)
@@ -412,13 +434,13 @@ class Sharing(Chapter):
                   Transform(ref_tail,code("refs = 1",17,GOLD).move_to(ref_tail)),FadeIn(private_ref),run_time=1.4)
         self.play(FadeOut(copy_arrow),FadeOut(copy_text),run_time=.5)
         self.wait(1.5)
-        self.caption("Now A can write token six into its private copy. B’s data stays unchanged, and the full prefix remains shared.")
+        self.caption(18)
         self.play(Transform(private.contents[2],private.put(2,6)),run_time=1)
         self.play(Indicate(tail,color=GOLD,scale_factor=1.04),Indicate(full,color=TEAL,scale_factor=1.04),run_time=1)
         self.mark("copy-on-write")
         self.wait(3)
         conclusion=prose("Logical continuity. Physical freedom.",37).move_to(DOWN*2.6)
-        self.caption("PagedAttention keeps token order intact while making GPU memory easier to allocate, reuse, and share.")
+        self.caption(19)
         self.play(Write(conclusion),run_time=1.5)
         self.wait(3)
         self.finish()

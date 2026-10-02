@@ -47,6 +47,10 @@ jobs:
         run: |
           if ! command -v ffmpeg >/dev/null; then sudo apt-get update && sudo apt-get install -y ffmpeg; fi
           python3 tests/audio_check.py
+      - name: Verify on-screen narration against the voice script
+        run: |
+          if ! command -v tesseract >/dev/null; then sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-eng; fi
+          python3 tests/caption_frames.py
       - uses: actions/upload-pages-artifact@v4
         with:
           path: docs

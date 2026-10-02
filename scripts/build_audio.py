@@ -2,7 +2,7 @@
 """Synthesize/cache narration, design quiet effects, and mux a timed stereo mix.
 
 Voice clips are checked in, so --offline rebuilds without a speech service.
-The video stream is copied intact: resolution, frame rate and chapter times stay fixed.
+Manim reads this same script and holds each caption until the full speech finishes.
 """
 import argparse
 import asyncio
@@ -131,42 +131,45 @@ def stamp(seconds):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--offline", action="store_true", help="Use checked-in speech clips; never request synthesis.")
+    parser.add_argument("--prepare-only", action="store_true", help="Synthesize and measure the shared script before Manim renders.")
     args = parser.parse_args()
     WORK.mkdir(parents=True, exist_ok=True)
     CACHE.mkdir(parents=True, exist_ok=True)
     spec = json.loads((ROOT / "audio/narration.json").read_text())
+    asyncio.run(generate(spec, args.offline))
+    clips = [trim_silence(decode(clip_path(text, spec))) for text in spec["cues"]]
+    prepared = {"voice": spec["voice"], "rate": spec["rate"], "cues": [
+        {"text": text, "duration": len(samples) / RATE}
+        for text, samples in zip(spec["cues"], clips)
+    ]}
+    (WORK / "narration-timing.json").write_text(json.dumps(prepared, indent=2) + "\n")
+    if args.prepare_only:
+        print(f"Prepared {len(clips)} verbatim speech clips for Manim timing.")
+        return
     visual = json.loads((ASSETS / "visual-cues.json").read_text())
     chapters = json.loads((ASSETS / "chapters.json").read_text())
-    assert len(spec["cues"]) == len(visual), "The voice script must match the visual cue count."
+    assert spec["cues"] == [c["text"] for c in visual], "Voice and on-screen text differ; re-render from the shared script."
     movie = ASSETS / "paged-attention.mp4"
     duration = float(probe(movie)["format"]["duration"])
-    asyncio.run(generate(spec, args.offline))
     narration = np.zeros(round(duration * RATE), dtype=np.float32)
     captions, speech = [], []
-    for index, (text, cue) in enumerate(zip(spec["cues"], visual)):
-        samples = trim_silence(decode(clip_path(text, spec)))
-        available = cue["end"] - cue["start"] - .38
-        tempo = max(1.0, len(samples) / RATE / available)
-        if tempo > 1.12:
-            raise ValueError(f"Cue {index + 1} needs {len(samples) / RATE:.2f}s, but has {available:.2f}s. Shorten its script.")
-        if tempo > 1:
-            wavfile.write(WORK / "fitting.wav", RATE, samples)
-            run("ffmpeg", "-y", "-v", "error", "-i", str(WORK / "fitting.wav"),
-                "-af", f"atempo={tempo:.8f}", "-c:a", "pcm_f32le", str(WORK / "fitted.wav"))
-            samples = wavfile.read(WORK / "fitted.wav")[1]
+    for index, (text, cue, samples) in enumerate(zip(spec["cues"], visual, clips)):
+        available = cue["end"] - cue["start"] - spec["speech_lead"] - spec["end_pause"]
+        if len(samples) / RATE > available + .025:
+            raise ValueError(f"Cue {index + 1} needs a longer visual hold. Run scripts/render.py; do not shorten the speech independently.")
         # Tiny edge fades prevent cuts from creating clicks.
         fade = min(round(.008 * RATE), len(samples) // 2)
         samples[:fade] *= np.linspace(0, 1, fade)
         samples[-fade:] *= np.linspace(1, 0, fade)
-        start = cue["start"] + .16
+        start = cue["start"] + spec["speech_lead"]
         end = start + len(samples) / RATE
-        assert end <= cue["end"] - .05, f"Cue {index + 1} runs into the next visual."
+        assert end <= cue["end"] - spec["end_pause"] + .025, f"Cue {index + 1} runs into the next visual."
         offset = round(start * RATE)
         narration[offset:offset + len(samples)] += samples
         captions.append({"start": round(start, 3), "end": round(end + .08, 3), "text": text})
         speech.append({"cue": index, "start": round(start, 3), "end": round(end, 3),
-                       "tempo": round(tempo, 5), "source": str(clip_path(text, spec).relative_to(ROOT))})
-        print(f"Cue {index + 1:02d}: {start:.2f}–{end:.2f}s; tempo {tempo:.3f}", flush=True)
+                       "text": text, "tempo": 1.0, "source": str(clip_path(text, spec).relative_to(ROOT))})
+        print(f"Cue {index + 1:02d}: {start:.2f}–{end:.2f}s; verbatim at natural speed", flush=True)
     wavfile.write(WORK / "narration-raw.wav", RATE, narration)
     normalize(WORK / "narration-raw.wav", WORK / "narration.wav", -18)
     _, narration = wavfile.read(WORK / "narration.wav")

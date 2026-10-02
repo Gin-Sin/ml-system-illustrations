@@ -27,6 +27,7 @@ def main():
     parser.add_argument("--silent", action="store_true", help="Skip narration for a visual draft.")
     args = parser.parse_args()
     fps = args.fps or (30 if args.quality == "l" else 60)
+    run(sys.executable, "scripts/build_audio.py", "--prepare-only")
     if not args.assemble_only:
         run(sys.executable, "-m", "manim", f"-q{args.quality}", "--fps", str(fps),
             "scenes/paged_attention.py", *CHAPTERS)

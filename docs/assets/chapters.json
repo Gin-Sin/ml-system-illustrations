@@ -7,26 +7,26 @@
   {
     "title": "How much memory should we reserve?",
     "start": 25.45,
-    "duration": 23.05
+    "duration": 23.633333
   },
   {
     "title": "Order and location are different things",
-    "start": 48.5,
-    "duration": 21.55
+    "start": 49.083,
+    "duration": 25.966667
   },
   {
     "title": "The addresses change. The mathematics stays.",
-    "start": 70.05,
-    "duration": 26.05
+    "start": 75.05,
+    "duration": 27.8
   },
   {
     "title": "Cross a boundary. Allocate one block.",
-    "start": 96.1,
-    "duration": 23.6
+    "start": 102.85,
+    "duration": 28.816667
   },
   {
     "title": "A shared past. Two different futures.",
-    "start": 119.7,
-    "duration": 25.2
+    "start": 131.667,
+    "duration": 34.583333
   }
 ]

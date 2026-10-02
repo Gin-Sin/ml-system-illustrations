@@ -2,151 +2,171 @@
   "voice": "en-US-AndrewNeural",
   "rate": "-8%",
   "engine": "edge-tts 7.2.8",
-  "duration": 144.9,
+  "duration": 166.25,
   "sample_rate": 48000,
   "channels": 2,
-  "loudness_lufs": -16.01,
-  "true_peak_dbtp": -2.47,
+  "loudness_lufs": -16.0,
+  "true_peak_dbtp": -2.41,
   "speech": [
     {
       "cue": 0,
-      "start": 1.16,
-      "end": 6.54,
+      "start": 1.4,
+      "end": 8.23,
+      "text": "Each token leaves behind two vectors: a key and a value. One attention head is shown here.",
       "tempo": 1.0,
-      "source": "audio/voice/0685746c195cd800.mp3"
+      "source": "audio/voice/94a469542b93c547.mp3"
     },
     {
       "cue": 1,
-      "start": 8.91,
-      "end": 15.33,
+      "start": 9.15,
+      "end": 14.68,
+      "text": "Decoding appends another key\u2013value pair. The earlier vectors stay in the cache.",
       "tempo": 1.0,
-      "source": "audio/voice/134ee208511f28cf.mp3"
+      "source": "audio/voice/ebbc1ecd52360b50.mp3"
     },
     {
       "cue": 2,
-      "start": 15.76,
-      "end": 22.8,
+      "start": 16.0,
+      "end": 22.08,
+      "text": "The next query reuses this growing cache to compute attention over the available context.",
       "tempo": 1.0,
-      "source": "audio/voice/50614cd08774eed1.mp3"
+      "source": "audio/voice/1d9dd8d88d9167e6.mp3"
     },
     {
       "cue": 3,
-      "start": 26.61,
-      "end": 32.993,
-      "tempo": 1.04082,
-      "source": "audio/voice/47add5d49f240361.mp3"
+      "start": 26.85,
+      "end": 33.23,
+      "text": "Suppose each request reserves twelve token slots, even though its final length is unknown.",
+      "tempo": 1.0,
+      "source": "audio/voice/93005d7e9ba8bc11.mp3"
     },
     {
       "cue": 4,
-      "start": 33.36,
-      "end": 39.42,
+      "start": 34.133,
+      "end": 39.833,
+      "text": "Cut the cache into blocks of four. Allocate only the blocks needed by the current tokens.",
       "tempo": 1.0,
-      "source": "audio/voice/37cc98fc32fc6365.mp3"
+      "source": "audio/voice/592d379909907533.mp3"
     },
     {
       "cue": 5,
-      "start": 39.91,
-      "end": 48.279,
-      "tempo": 1.04659,
-      "source": "audio/voice/703562d035c69721.mp3"
+      "start": 40.733,
+      "end": 47.623,
+      "text": "The same fourteen tokens now occupy twenty slots. Only the final block of each request has slack.",
+      "tempo": 1.0,
+      "source": "audio/voice/c9cb183ab812a452.mp3"
     },
     {
       "cue": 6,
-      "start": 49.66,
-      "end": 56.32,
+      "start": 50.483,
+      "end": 56.783,
+      "text": "A block table connects the token sequence to physical memory. Matching colors follow the same data.",
       "tempo": 1.0,
-      "source": "audio/voice/19274f0daafb8775.mp3"
+      "source": "audio/voice/bcaf3c3ec55e20ed.mp3"
     },
     {
       "cue": 7,
-      "start": 57.41,
-      "end": 62.02,
+      "start": 58.233,
+      "end": 65.323,
+      "text": "For token six, divide by the block size. The quotient chooses a block; the remainder chooses a slot.",
       "tempo": 1.0,
-      "source": "audio/voice/acb4d99a53972580.mp3"
+      "source": "audio/voice/326b3a9f7ce13906.mp3"
     },
     {
       "cue": 8,
-      "start": 62.66,
-      "end": 69.58,
+      "start": 66.233,
+      "end": 74.533,
+      "text": "Follow table[1] to physical block P2, then read slot 2. The logical token index is still six.",
       "tempo": 1.0,
-      "source": "audio/voice/238cb9fa7db992c0.mp3"
+      "source": "audio/voice/77f6abf6bdbe21d7.mp3"
     },
     {
       "cue": 9,
-      "start": 71.21,
-      "end": 79.78,
+      "start": 76.45,
+      "end": 82.93,
+      "text": "The query compares with every valid key, even when those keys are stored in different physical blocks.",
       "tempo": 1.0,
-      "source": "audio/voice/a38fbf01244098af.mp3"
+      "source": "audio/voice/8279d3754327dd72.mp3"
     },
     {
       "cue": 10,
-      "start": 81.76,
-      "end": 88.84,
+      "start": 87.0,
+      "end": 94.08,
+      "text": "Softmax normalizes all of these scores together. Physical block boundaries do not split the denominator.",
       "tempo": 1.0,
-      "source": "audio/voice/e4b37873362ace82.mp3"
+      "source": "audio/voice/404b39562589ae2a.mp3"
     },
     {
       "cue": 11,
-      "start": 89.41,
-      "end": 95.882,
-      "tempo": 1.03709,
-      "source": "audio/voice/5f4c02d963441119.mp3"
+      "start": 94.983,
+      "end": 102.343,
+      "text": "Use these weights to mix the value vectors. Paging changes storage, while preserving the attention calculation.",
+      "tempo": 1.0,
+      "source": "audio/voice/01811adad378e40e.mp3"
     },
     {
       "cue": 12,
-      "start": 97.26,
-      "end": 102.05,
+      "start": 104.25,
+      "end": 111.35,
+      "text": "At six tokens, the request owns two blocks. Appending token six writes into an existing slot.",
       "tempo": 1.0,
-      "source": "audio/voice/ad5763bb8bcd3b4c.mp3"
+      "source": "audio/voice/4b2cb2586f336c95.mp3"
     },
     {
       "cue": 13,
-      "start": 103.01,
-      "end": 106.5,
+      "start": 112.267,
+      "end": 117.207,
+      "text": "Token seven fills the remaining slot. The block table is unchanged.",
       "tempo": 1.0,
-      "source": "audio/voice/366368da47ce72b3.mp3"
+      "source": "audio/voice/723ab8e20f0d2ec4.mp3"
     },
     {
       "cue": 14,
-      "start": 107.06,
-      "end": 112.92,
+      "start": 118.117,
+      "end": 124.187,
+      "text": "For token eight, the offset becomes zero. Allocate a free block, then extend the table.",
       "tempo": 1.0,
-      "source": "audio/voice/a16f64402dc80116.mp3"
+      "source": "audio/voice/6ea2c9b7a89bf727.mp3"
     },
     {
       "cue": 15,
-      "start": 113.71,
-      "end": 119.34,
+      "start": 125.1,
+      "end": 131.16,
+      "text": "After the request finishes, its unshared blocks return to the pool and can serve another request.",
       "tempo": 1.0,
-      "source": "audio/voice/1db1d43f770af812.mp3"
+      "source": "audio/voice/f2046ae8fab5fbbf.mp3"
     },
     {
       "cue": 16,
-      "start": 120.86,
-      "end": 126.932,
-      "tempo": 1.00988,
-      "source": "audio/voice/58ceb8f8f6d6fd33.mp3"
+      "start": 133.067,
+      "end": 140.457,
+      "text": "Two continuations can share prefix blocks. Reference counts record how many requests still need each block.",
+      "tempo": 1.0,
+      "source": "audio/voice/04bb0f6e56e8e478.mp3"
     },
     {
       "cue": 17,
-      "start": 127.31,
-      "end": 132.46,
+      "start": 141.367,
+      "end": 148.397,
+      "text": "A is about to append into a shared partial block. First copy that block; then change only A\u2019s table.",
       "tempo": 1.0,
-      "source": "audio/voice/310605efbe7ce9d4.mp3"
+      "source": "audio/voice/b606533bf63bf619.mp3"
     },
     {
       "cue": 18,
-      "start": 132.86,
-      "end": 137.74,
+      "start": 149.3,
+      "end": 157.07,
+      "text": "Now A can write token six into its private copy. B\u2019s data stays unchanged, and the full prefix remains shared.",
       "tempo": 1.0,
-      "source": "audio/voice/951a47506a599dfd.mp3"
+      "source": "audio/voice/c98f98402a42f2c9.mp3"
     },
     {
       "cue": 19,
-      "start": 138.21,
-      "end": 142.38,
+      "start": 157.983,
+      "end": 165.733,
+      "text": "PagedAttention keeps token order intact while making GPU memory easier to allocate, reuse, and share.",
       "tempo": 1.0,
-      "source": "audio/voice/0b0afc625a9489ca.mp3"
+      "source": "audio/voice/3e18c55fb47ff04e.mp3"
     }
   ],
   "effects": [
@@ -155,154 +175,154 @@
       "offset": 0.6,
       "kind": "tick",
       "pan": -0.45,
-      "time": 1.6000000000000014
+      "time": 1.6
     },
     {
       "cue": 0,
       "offset": 1.2,
       "kind": "tick",
       "pan": -0.15,
-      "time": 2.200000000000001
+      "time": 2.2
     },
     {
       "cue": 0,
       "offset": 1.8,
       "kind": "tick",
       "pan": 0.15,
-      "time": 2.8000000000000016
+      "time": 2.8
     },
     {
       "cue": 1,
       "offset": 1.8,
       "kind": "write",
       "pan": 0.4,
-      "time": 10.549999999999983
+      "time": 10.55
     },
     {
       "cue": 2,
       "offset": 3.8,
       "kind": "resolve",
       "pan": 0,
-      "time": 19.400000000000173
+      "time": 19.4
     },
     {
       "cue": 4,
       "offset": 2.1,
       "kind": "copy",
       "pan": 0,
-      "time": 35.29999999999999
+      "time": 35.83333333333333
     },
     {
       "cue": 5,
       "offset": 1.4,
       "kind": "resolve",
       "pan": 0.3,
-      "time": 41.15000000000015
+      "time": 41.733333333333505
     },
     {
       "cue": 6,
       "offset": 3.3,
       "kind": "tick",
       "pan": 0.25,
-      "time": 52.8
+      "time": 53.38333299999999
     },
     {
       "cue": 6,
       "offset": 4.5,
       "kind": "tick",
       "pan": 0.25,
-      "time": 54.0
+      "time": 54.583332999999996
     },
     {
       "cue": 6,
       "offset": 5.7,
       "kind": "tick",
       "pan": 0.25,
-      "time": 55.2
+      "time": 55.783333
     },
     {
       "cue": 8,
       "offset": 0.4,
       "kind": "trace",
       "pan": 0.25,
-      "time": 62.90000000000019
+      "time": 66.233333
     },
     {
       "cue": 8,
       "offset": 1.6,
       "kind": "write",
       "pan": 0.3,
-      "time": 64.1000000000002
+      "time": 67.43333299999999
     },
     {
       "cue": 10,
       "offset": 3.3,
       "kind": "resolve",
       "pan": 0,
-      "time": 84.90000000000005
+      "time": 89.89999999999999
     },
     {
       "cue": 12,
       "offset": 3.5,
       "kind": "write",
       "pan": -0.3,
-      "time": 100.6
+      "time": 107.35
     },
     {
       "cue": 13,
       "offset": 1.3,
       "kind": "write",
       "pan": -0.3,
-      "time": 104.14999999999998
+      "time": 113.16666666666666
     },
     {
       "cue": 14,
       "offset": 2.7,
       "kind": "allocate",
       "pan": -0.3,
-      "time": 109.6
+      "time": 120.41666666666674
     },
     {
       "cue": 14,
       "offset": 3.5,
       "kind": "write",
       "pan": -0.3,
-      "time": 110.39999999999999
+      "time": 121.21666666666674
     },
     {
       "cue": 15,
       "offset": 0.45,
       "kind": "release",
       "pan": -0.15,
-      "time": 114.00000000000018
+      "time": 125.14999999999999
     },
     {
       "cue": 16,
       "offset": 3.1,
       "kind": "resolve",
       "pan": 0.2,
-      "time": 123.79999999999998
+      "time": 135.76666699999998
     },
     {
       "cue": 17,
       "offset": 0.45,
       "kind": "copy",
       "pan": 0.3,
-      "time": 127.59999999999998
+      "time": 141.416667
     },
     {
       "cue": 17,
       "offset": 3.45,
       "kind": "allocate",
       "pan": 0.3,
-      "time": 130.59999999999997
+      "time": 144.416667
     },
     {
       "cue": 18,
       "offset": 1.2,
       "kind": "write",
       "pan": 0.3,
-      "time": 133.90000000000015
+      "time": 150.10000033333353
     },
     {
       "kind": "chapter",
@@ -316,22 +336,22 @@
     },
     {
       "kind": "chapter",
-      "time": 48.63,
+      "time": 49.213,
       "pan": 0
     },
     {
       "kind": "chapter",
-      "time": 70.17999999999999,
+      "time": 75.17999999999999,
       "pan": 0
     },
     {
       "kind": "chapter",
-      "time": 96.22999999999999,
+      "time": 102.97999999999999,
       "pan": 0
     },
     {
       "kind": "chapter",
-      "time": 119.83,
+      "time": 131.797,
       "pan": 0
     }
   ],
