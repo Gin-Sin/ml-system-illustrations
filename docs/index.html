@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1018" />
+    <meta
+      name="description"
+      content="See how PagedAttention works. An original Manim visual essay and interactive KV-cache playground by Gin-Sin."
+    />
+    <meta
+      property="og:title"
+      content="PagedAttention — ML Systems, Illustrated"
+    />
+    <meta
+      property="og:description"
+      content="A visual journey from growing KV caches to block tables and copy-on-write sharing."
+    />
+    <meta
+      property="og:image"
+      content="https://gin-sin.github.io/ml-system-illustrations/assets/poster.jpg"
+    />
+    <title>PagedAttention — ML Systems, Illustrated</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="site-header wrap">
+      <a class="wordmark" href="./" aria-label="ML Systems Illustrated home"
+        ><span class="mark" aria-hidden="true"
+          ><i></i><i></i><i></i><i></i
+        ></span>
+        ML SYSTEMS <span class="wordmark-light">/ ILLUSTRATED</span></a
+      >
+      <a
+        class="source-link"
+        href="https://github.com/Gin-Sin/ml-system-illustrations"
+        >Source on GitHub <span aria-hidden="true">↗</span></a
+      >
+    </header>
+    <main id="main" class="wrap">
+      <section class="intro" aria-labelledby="page-title">
+        <div class="eyebrow">
+          <span class="status-dot"></span> VISUAL NOTE 001
+          <span class="eyebrow-divider">/</span> LLM INFERENCE
+        </div>
+        <h1 id="page-title">
+          Attention, without<br />the <em>memory waste.</em>
+        </h1>
+        <div class="intro-bottom">
+          <p>
+            A visual guide to <strong>PagedAttention</strong>.<br />Follow a
+            token from its logical address to a little piece of GPU memory.
+          </p>
+          <a class="text-link" href="#playground"
+            >Then, try it yourself <span aria-hidden="true">↓</span></a
+          >
+        </div>
+      </section>
+
+      <section id="film" class="film-section" aria-labelledby="film-title">
+        <div class="section-top">
+          <h2 id="film-title">
+            <span class="section-index">01</span> Watch the idea unfold
+          </h2>
+          <span class="quiet film-meta"
+            >MANIM · <span id="duration">6 CHAPTERS</span> · SILENT,
+            CAPTIONED</span
+          >
+        </div>
+        <div class="cinema">
+          <div class="screen">
+            <video
+              id="film-player"
+              controls
+              playsinline
+              preload="metadata"
+              poster="assets/poster.jpg"
+              aria-label="PagedAttention: a six-chapter Manim animation"
+            >
+              <source src="assets/paged-attention.mp4" type="video/mp4" />
+              <track
+                kind="captions"
+                label="English"
+                srclang="en"
+                src="assets/captions.vtt"
+              />
+              Your browser does not support embedded video.
+              <a href="assets/paged-attention.mp4">Download the animation.</a>
+            </video>
+            <div class="screen-footer">
+              <span><i class="tiny-dot"></i> A GEOMETRIC EXPLANATION</span
+              ><a href="assets/paged-attention.mp4" download>Download film ↓</a>
+            </div>
+          </div>
+          <nav class="chapters" aria-label="Video chapters">
+            <div class="chapter-label">THE SIX SMALL IDEAS</div>
+            <div id="chapter-list"><p class="quiet">Loading chapters…</p></div>
+            <div class="chapter-foot">
+              Start anywhere. Follow at your own pace.
+            </div>
+          </nav>
+        </div>
+        <details class="transcript">
+          <summary>
+            Read the film transcript <span aria-hidden="true">+</span>
+          </summary>
+          <div id="transcript-content">
+            The film captions are also available as
+            <a href="assets/captions.vtt">a text file</a>.
+          </div>
+        </details>
+      </section>
+
+      <section id="playground" class="lab" aria-labelledby="lab-title">
+        <div class="section-top">
+          <h2 id="lab-title">
+            <span class="section-index">02</span> Put the memory in motion
+          </h2>
+          <span class="quiet">INTERACTIVE BLOCK ALLOCATOR</span>
+        </div>
+        <div class="lab-heading">
+          <h3>Small blocks.<br /><em>Room to grow.</em></h3>
+          <p>
+            Append a token, fork a request, or free its memory. Watch the block
+            table change while logical token order stays intact.
+          </p>
+        </div>
+        <div class="lab-shell">
+          <div class="lab-toolbar">
+            <div class="request-picker">
+              <span class="control-label">REQUEST</span>
+              <div id="requests" role="group" aria-label="Select request"></div>
+            </div>
+            <label class="block-size control-label"
+              >TOKENS / BLOCK
+              <select id="block-size">
+                <option value="4">4</option>
+                <option value="8">8</option>
+              </select></label
+            ><button class="button-quiet" id="reset">↺ Reset</button>
+          </div>
+          <div class="actions">
+            <button id="append" class="button-primary">
+              Append token <span aria-hidden="true">+</span></button
+            ><button id="fork">Fork request</button
+            ><button id="release">Finish request</button
+            ><span id="request-length" class="quiet"></span>
+          </div>
+          <div class="memory-stage">
+            <div class="logical-panel">
+              <div class="diagram-label">
+                <span>01 / LOGICAL VIEW</span><span id="logical-count"></span>
+              </div>
+              <p class="diagram-hint">
+                Token order within the selected request
+              </p>
+              <div id="logical-blocks"></div>
+              <div class="lookup-control">
+                <label for="token"
+                  >Inspect token
+                  <output id="token-value" for="token">0</output></label
+                ><input id="token" type="range" min="0" max="5" value="0" />
+              </div>
+            </div>
+            <div class="table-panel">
+              <div class="diagram-label">02 / BLOCK TABLE</div>
+              <p class="diagram-hint">logical → physical</p>
+              <div id="block-table"></div>
+            </div>
+            <div class="physical-panel">
+              <div class="diagram-label">
+                <span>03 / GPU MEMORY</span><span>12 BLOCKS</span>
+              </div>
+              <p class="diagram-hint">
+                Physical order is independent of token order
+              </p>
+              <div id="physical-blocks"></div>
+              <div class="legend">
+                <span><i class="legend-a"></i> A</span
+                ><span><i class="legend-b"></i> B</span
+                ><span><i class="legend-shared"></i> shared</span
+                ><span><i class="legend-free"></i> free</span>
+              </div>
+            </div>
+          </div>
+          <div id="address" class="address" aria-live="polite"></div>
+          <div class="metrics">
+            <div>
+              <strong id="metric-used">0</strong><span>stored KV entries</span>
+            </div>
+            <div>
+              <strong id="metric-blocks">0 / 12</strong
+              ><span>blocks allocated</span>
+            </div>
+            <div>
+              <strong id="metric-slack">0</strong
+              ><span>unused allocated slots</span>
+            </div>
+            <div>
+              <strong id="metric-shared">0</strong><span>shared blocks</span>
+            </div>
+          </div>
+          <p class="event-log" id="event" role="status">
+            Ready. Select a request and append a token.
+          </p>
+        </div>
+        <p class="lab-note">
+          A teaching model: each cell represents one token’s KV entry. Real
+          caches store vectors for multiple layers and KV heads. Block sizes and
+          sharing policies depend on the engine; this model uses reference
+          counts and copy-on-write, with no eviction or prefix-cache retention.
+        </p>
+      </section>
+
+      <section class="notes" aria-labelledby="notes-title">
+        <div class="section-top">
+          <h2 id="notes-title">
+            <span class="section-index">03</span> Keep these three ideas
+          </h2>
+          <span class="quiet">THE TAKEAWAY</span>
+        </div>
+        <div class="note-grid">
+          <article>
+            <span class="note-symbol blue">⌊t / B⌋</span>
+            <h3>Separate order from location.</h3>
+            <p>
+              Token <var>t</var> belongs to logical block ⌊<var>t / B</var>⌋, at
+              offset <var>t</var> mod <var>B</var>. The block table supplies its
+              physical address.
+            </p>
+          </article>
+          <article>
+            <span class="note-symbol teal">∑ αᵢ vᵢ</span>
+            <h3>Keep the same attention.</h3>
+            <p>
+              All valid keys participate in the same normalization. Physical
+              pages are storage units; they do not create separate attention
+              windows.
+            </p>
+          </article>
+          <article>
+            <span class="note-symbol gold">B − 1</span>
+            <h3>Bound the unused tail.</h3>
+            <p>
+              A sequence’s final block wastes at most <var>B − 1</var> token
+              slots in this model. Shared blocks save space until a write needs
+              a private copy.
+            </p>
+          </article>
+        </div>
+      </section>
+      <section class="reading" aria-labelledby="reading-title">
+        <h2 id="reading-title">Go one layer deeper</h2>
+        <a href="https://arxiv.org/abs/2309.06180"
+          ><span>01</span>
+          <div>
+            Efficient Memory Management for Large Language Model Serving with
+            PagedAttention<small
+              >Kwon et al. · SOSP 2023 · Original paper</small
+            >
+          </div>
+          <span aria-hidden="true">↗</span></a
+        ><a href="https://docs.vllm.ai/en/latest/design/paged_attention/"
+          ><span>02</span>
+          <div>
+            Inside the PagedAttention kernel<small
+              >vLLM · Kernel design and memory layout</small
+            >
+          </div>
+          <span aria-hidden="true">↗</span></a
+        ><a href="https://vllm.ai/blog/2023-06-20-vllm"
+          ><span>03</span>
+          <div>
+            The intuition behind vLLM<small
+              >vLLM · Blocks, sharing, and copy-on-write</small
+            >
+          </div>
+          <span aria-hidden="true">↗</span></a
+        >
+      </section>
+    </main>
+    <footer class="wrap">
+      <span
+        >ML SYSTEMS, ILLUSTRATED <span class="footer-sep">/</span> BY
+        <a href="https://github.com/Gin-Sin">GIN-SIN</a></span
+      ><span
+        >Original Manim animations, inspired by 3Blue1Brown’s visual
+        approach.</span
+      >
+    </footer>
+  </body>
+</html>

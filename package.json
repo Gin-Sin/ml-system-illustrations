@@ -1,0 +1,8 @@
+{
+  "name": "ml-system-illustrations",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/allocator.test.js"
+  }
+}

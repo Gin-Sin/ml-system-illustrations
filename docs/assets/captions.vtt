@@ -1,0 +1,61 @@
+WEBVTT
+
+00:00:01.000 --> 00:00:07.167
+During decoding, each token contributes a key and a value to the KV cache.
+
+00:00:07.167 --> 00:00:13.533
+The next query attends to the stored keys, then mixes the stored values.
+
+00:00:13.533 --> 00:00:19.400
+As requests grow at different speeds, where should all these KV entries live?
+
+00:00:20.400 --> 00:00:26.567
+Imagine reserving 12 token slots per request, before its final length is known.
+
+00:00:26.567 --> 00:00:31.933
+Instead, allocate fixed-size blocks on demand. Here, one block holds four tokens.
+
+00:00:31.933 --> 00:00:38.000
+Only a request’s last block can have unused slots: at most B − 1 per sequence.
+
+00:00:39.000 --> 00:00:45.867
+Logical blocks preserve token order. Physical blocks can live anywhere in the pool.
+
+00:00:45.867 --> 00:00:51.433
+For token 6 with B = 4: logical block = floor(6 / 4) = 1, offset = 2.
+
+00:00:51.433 --> 00:00:57.700
+The table maps logical block 1 to physical block 2. The token offset stays 2.
+
+00:00:58.700 --> 00:01:05.350
+The attention kernel follows the block table to read the request’s keys and values.
+
+00:01:05.350 --> 00:01:12.500
+Each key produces a score. All valid scores share one softmax normalization.
+
+00:01:12.500 --> 00:01:18.650
+Mix the values with these weights. Paging changes addresses, not the attention formula.
+
+00:01:19.700 --> 00:01:24.167
+A six-token request owns two blocks. Its last block still has room.
+
+00:01:24.167 --> 00:01:28.133
+Tokens 6 and 7 fill existing space. No new physical block is needed.
+
+00:01:28.133 --> 00:01:32.500
+Token 8 crosses a block boundary. Allocate a free block and extend the table.
+
+00:01:32.500 --> 00:01:37.867
+When this request finishes, its unshared blocks return to the pool for reuse.
+
+00:01:38.867 --> 00:01:44.417
+Two continuations can share the same prefix blocks instead of duplicating their KV data.
+
+00:01:44.417 --> 00:01:48.083
+If A appends to a shared partial block, first copy that block to a new physical block.
+
+00:01:48.083 --> 00:01:52.350
+A writes token 6 into its private copy. B’s cache is untouched; the full prefix stays shared.
+
+00:01:52.350 --> 00:01:58.817
+PagedAttention combines block-based storage, address translation, and safe KV-cache sharing.
